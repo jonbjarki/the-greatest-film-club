@@ -1,11 +1,18 @@
-from sqlmodel import SQLModel, create_engine
 import os
-    
+from dotenv import load_dotenv
+from fastapi.security import OAuth2PasswordBearer
+from sqlmodel import Session, SQLModel, create_engine
+
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
 
-# Synchronous Engine
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+load_dotenv()
+
 sync_url = os.environ.get("DB_URL")
 engine = create_engine(sync_url, echo=True)
 
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
