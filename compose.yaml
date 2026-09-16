@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres
+    restart: always
+    user: postgres
+    volumes:
+      - movie_data:/var/lib/postgresql/
+    environment:
+      - POSTGRES_DB=movies
+      - POSTGRES_PASSWORD=Abc.123
+      - POSTGRES_USER=postgres
+    expose:
+      - 5432
+    ports:
+      - 5433:5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  movie_data:
