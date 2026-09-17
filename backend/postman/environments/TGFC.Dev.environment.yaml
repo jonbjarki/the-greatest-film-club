@@ -6,4 +6,8 @@ values:
     secret: true
   - key: jwt_token
     secret: true
+  - key: SECRET_KEY
+    secret: true
+  - key: jwt_token
+    secret: true
 color: 240

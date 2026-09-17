@@ -38,12 +38,9 @@ async def list_movies():
     with Session(engine) as session:
         movies = session.exec(select(Movie)).all()
 
-        return {
-            "movies": [
-                {**movie.model_dump(), "vote_count": len(movie.votes)}
-                for movie in movies
-            ]
-        }
+        return [
+            {**movie.model_dump(), "vote_count": len(movie.votes)} for movie in movies
+        ]
 
 
 @router.post("/{id}")
@@ -52,7 +49,8 @@ async def root(
 ):
     movie = get_movie(id)
     credits = get_credits(id)
-
+    release_date = movie.get("release_date")
+    release_year = int(release_date[:4]) if release_date else None
     new_movie = Movie(
         id=movie["id"],
         name=movie["title"],
@@ -70,6 +68,7 @@ async def root(
         ],
         backdrop_url=build_image_url(movie.get("backdrop_path")),
         poster_url=build_image_url(movie.get("poster_path")),
+        release_year=release_year,
         user_id=current_user.id,
     )
 
@@ -79,7 +78,7 @@ async def root(
         session.refresh(new_movie)
         print(f"Created movie with ID: {new_movie.id}")
 
-    return {"movie": new_movie}
+    return new_movie
 
 
 @router.post("/{id}/vote")

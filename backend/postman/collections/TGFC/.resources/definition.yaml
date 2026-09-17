@@ -1,15 +1,40 @@
 $kind: collection
+variables:
+  - key: json_web_token_043p
+    secret: true
+    disabled: false
 auth:
   - id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
     type: oauth2
     name: OAuth 2.0
     credentials:
-      addTokenTo: header
-      clientSecret: "{{SECRET_KEY}}"
-      clientId: string
-      authUrl: ""
-      accessTokenUrl: http://localhost:8000/token
-      tokenName: nonnitoken
-      grant_type: password_credentials
-      username: nonni
-      password: Abc.123
+      - key: tokenType
+        value: bearer
+      - key: token_id
+        value: a2d683d7-ca5f-4abd-9f69-664b6afafe04
+      - key: accessToken
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJub25uaSIsImV4cCI6MTc4OTY0NTAzMH0.TLDCQ4OsDRZPys1dy60KibBqrOBZOTqcw1xtU13_F-g
+      - key: timestamp
+        value: 1789643230035
+      - key: addTokenTo
+        value: header
+      - key: clientSecret
+        value: "{{SECRET_KEY}}"
+      - key: clientId
+        value: string
+      - key: authUrl
+        value: ""
+      - key: accessTokenUrl
+        value: http://localhost:8000/token
+      - key: tokenName
+        value: token
+      - key: grant_type
+        value: password_credentials
+      - key: username
+        value: nonni
+      - key: password
+        value: Abc.123
+      - key: id
+        value: collection/A8F1f22CDBa16f3e3EA73a2C/b1397e40-6f0b-4456-b047-d6ba94a4669b/filesystem
+      - key: id
+        value: collection/A8F1f22CDBa16f3e3EA73a2C/b1397e40-6f0b-4456-b047-d6ba94a4669b/filesystem

@@ -1,12 +1,12 @@
 $kind: http-request
-url: '{{base_url}}/movies/{{id}}'
+url: "{{base_url}}/movies/{{id}}"
 method: POST
 pathVariables:
   - key: id
-    value: ''
+    value: "969681"
+    description: ""
 auth:
-  type: bearer
+  type: inherit
   credentials:
-    - key: token
-      value: '{{access_token}}'
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
 order: 653458588417185
