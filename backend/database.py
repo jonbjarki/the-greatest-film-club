@@ -19,4 +19,4 @@ load_dotenv()
 sync_url = os.environ.get("DB_URL")
 engine = create_engine(sync_url, echo=True)
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

@@ -1,1 +1,46 @@
 postman/.dependencies/
+
+# Byte-compiled / optimized / DLL files
+**__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Environments & Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# FastAPI / Uvicorn / Gunicorn logs
+*.log
+log/
+logs/
+
+# Pydantic / Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# Dependency managers (Choose based on your tool)
+# If using pipenv, poetry, or uv, keep the lock files but ignore the tool caches
+.pipenv/
+.poetry/
+.uv/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDEs and Editors
+.idea/
+.vscode/
+*.swp
+*.swo
