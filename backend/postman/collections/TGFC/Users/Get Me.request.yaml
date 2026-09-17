@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{base_url}}/users/me"
+method: GET
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 3000000000000

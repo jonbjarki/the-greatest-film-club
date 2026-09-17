@@ -1,0 +1,15 @@
+$kind: collection
+auth:
+  - id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+    type: oauth2
+    name: OAuth 2.0
+    credentials:
+      addTokenTo: header
+      clientSecret: "{{SECRET_KEY}}"
+      clientId: string
+      authUrl: ""
+      accessTokenUrl: http://localhost:8000/token
+      tokenName: nonnitoken
+      grant_type: password_credentials
+      username: nonni
+      password: Abc.123

@@ -1,0 +1,10 @@
+$kind: http-request
+url: https://api.themoviedb.org/3/search/movie?query=spider+man
+method: GET
+queryParams:
+  query: spider+man
+auth:
+  type: inherit
+  credentials:
+    id: 0a61c697-e197-4a82-bf1f-8f5fe60bf14b
+order: 1789603846091

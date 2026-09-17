@@ -1,0 +1,8 @@
+name: Development
+values:
+  - key: jwt_token
+    secret: true
+  - key: base_url
+    value: ''
+  - key: tmdb_key
+    secret: true

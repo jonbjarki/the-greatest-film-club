@@ -1,0 +1,6 @@
+name: Development
+values:
+  - key: base_url
+    value: ''
+  - key: SECRET_KEY
+    secret: true

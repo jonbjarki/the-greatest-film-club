@@ -1,4 +1,10 @@
-from sqlmodel import Field, SQLModel
+from typing import List
+from typing import TYPE_CHECKING
+from sqlmodel import Field, Relationship, SQLModel
+
+if TYPE_CHECKING:
+    from .movie import Movie
+    from .vote import Vote
 
 
 class User(SQLModel, table=True):
@@ -6,3 +12,5 @@ class User(SQLModel, table=True):
     username: str = Field(index=True, unique=True)
     hashed_password: str
     is_admin: bool = False
+    added_movies: List["Movie"] = Relationship(back_populates="user")
+    votes: List["Vote"] = Relationship(back_populates="user")

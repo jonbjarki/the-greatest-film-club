@@ -1,0 +1,14 @@
+$kind: http-request
+url: "{{base_url}}/token"
+method: POST
+body:
+  type: urlencoded
+  content:
+    username: ""
+    password: ""
+    grant_type: password
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 1000000000000

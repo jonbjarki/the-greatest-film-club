@@ -1,21 +1,23 @@
-from typing import List
-from sqlmodel import ARRAY, Field, SQLModel, String
+from datetime import datetime
+from typing import TYPE_CHECKING, List
+from sqlmodel import ARRAY, Field, ForeignKey, Relationship, SQLModel, String
+
+from .user import User
+
+if TYPE_CHECKING:
+    from .vote import Vote
+
 
 class Movie(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     name: str
     description: str
-    genres: List[str] = Field(
-        default_factory=list,
-        sa_type=ARRAY(String)
-    )
-    actor_names: List[str] = Field(
-        default_factory=list,
-        sa_type=ARRAY(String)
-    )
-    director_names: List[str] = Field(
-        default_factory=list,
-        sa_type=ARRAY(String)
-    )
+    genres: List[str] = Field(default_factory=list, sa_type=ARRAY(String))
+    actor_names: List[str] = Field(default_factory=list, sa_type=ARRAY(String))
+    director_names: List[str] = Field(default_factory=list, sa_type=ARRAY(String))
     backdrop_url: str | None = None
     poster_url: str | None = None
+    user_id: int | None = Field(foreign_key="user.id")
+    user: User | None = Relationship(back_populates="added_movies")
+    added_at: datetime = Field(default_factory=datetime.now)
+    votes: List["Vote"] = Relationship(back_populates="movie")

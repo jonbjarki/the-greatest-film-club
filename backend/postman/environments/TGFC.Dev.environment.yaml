@@ -1,0 +1,9 @@
+name: TGFC.Dev
+values:
+  - key: base_url
+    value: ''
+  - key: tmdb_key
+    secret: true
+  - key: jwt_token
+    secret: true
+color: 240
