@@ -1,8 +1,8 @@
 $kind: http-request
-url: https://api.themoviedb.org/3/search/movie?query=spider+man
+url: https://api.themoviedb.org/3/search/movie?query=spirited away
 method: GET
 queryParams:
-  query: spider+man
+  query: spirited away
 auth:
   type: inherit
   credentials:

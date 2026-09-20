@@ -1,16 +1,20 @@
 "use client"
-import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
-import { DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog";
-import { Dialog, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { MovieType } from "@/types/movie-types";
 import Image from "next/image"
 import { Badge } from "../ui/badge";
+import VoteForm from "./vote-form";
+import { useState } from "react";
 
 export default function MovieItem({ movie }: { movie: MovieType }) {
+    const [open, setOpen] = useState(false);
+    const handleOpenChange = (open: boolean) => {
+        setOpen(open);
+    }
     return (
         <li>
-            <Dialog>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
                 <DialogTrigger asChild>
                     <Card className="cursor-pointer gap-0 py-0 hover:bg-accent/50 transition-colors h-full">
                         <div className="relative aspect-video w-full">
@@ -62,9 +66,10 @@ export default function MovieItem({ movie }: { movie: MovieType }) {
 
                     <DialogFooter className="w-full">
                         <Badge>{movie.vote_count} votes</Badge>
-                        <form>
-                            <Button type="submit">Vote for this movie</Button>
-                        </form>
+                        <VoteForm movieId={movie.id} closeDialog={() => {
+                            console.log("CLOSING");
+                            setOpen(false);
+                        }} />
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

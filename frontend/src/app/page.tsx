@@ -1,4 +1,3 @@
-import SignInButton from "@/components/auth/sign-in-button";
 import MovieList from "@/components/movie/movie-list";
 import { auth } from "../../auth";
 import Link from "next/link";

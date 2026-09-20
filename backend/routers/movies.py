@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from typing_extensions import Annotated
 from sqlmodel import Session, select
 import requests
@@ -83,13 +83,21 @@ async def root(
 
 @router.post("/{id}/vote")
 async def vote_movie(
-    id: int, current_user: Annotated[User, Depends(get_current_active_user)]
+    id: int,
+    response: Response,
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     with Session(engine) as session:
         movie = session.get(Movie, id)
         if not movie:
             return {"error": "Movie not found"}
-        # Implement voting logic here
+        existing_vote = session.exec(
+            select(Vote).where(Vote.user_id == current_user.id, Vote.movie_id == id)
+        ).first()
+        if existing_vote:
+            response.status_code = 409
+            return {"error": "User has already voted for this movie"}
+
         new_vote = Vote(user_id=current_user.id, movie_id=id)
         session.add(new_vote)
         session.commit()

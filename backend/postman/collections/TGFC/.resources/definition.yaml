@@ -3,6 +3,9 @@ variables:
   - key: json_web_token_043p
     secret: true
     disabled: false
+  - key: json_web_token_0ip2
+    secret: true
+    disabled: false
 auth:
   - id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
     type: oauth2
@@ -11,11 +14,11 @@ auth:
       - key: tokenType
         value: bearer
       - key: token_id
-        value: a2d683d7-ca5f-4abd-9f69-664b6afafe04
+        value: 5053a794-5840-48e3-9f0e-d505547cbb2f
       - key: accessToken
-        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJub25uaSIsImV4cCI6MTc4OTY0NTAzMH0.TLDCQ4OsDRZPys1dy60KibBqrOBZOTqcw1xtU13_F-g
+        value: "{{json_web_token_0ip2}}"
       - key: timestamp
-        value: 1789643230035
+        value: 1789648040245
       - key: addTokenTo
         value: header
       - key: clientSecret
@@ -25,7 +28,7 @@ auth:
       - key: authUrl
         value: ""
       - key: accessTokenUrl
-        value: http://localhost:8000/token
+        value: http://localhost:8000/auth/login
       - key: tokenName
         value: token
       - key: grant_type

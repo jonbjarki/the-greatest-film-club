@@ -2,7 +2,11 @@ import { MovieType } from "@/types/movie-types";
 import MovieItem from "./movie-item";
 
 async function fetchMovies() {
-    const res = await fetch(process.env.API_URL + "/movies");
+    const res = await fetch(process.env.API_URL + "/movies", {
+        next: {
+            tags: ["movies"]
+        }
+    });
     const data = await res.json();
     console.log("Received:", data);
     return data as MovieType[];
