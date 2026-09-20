@@ -103,3 +103,26 @@ async def vote_movie(
         session.commit()
         session.refresh(new_vote)
         return {"message": f"User {current_user.id} voted for movie {id}"}
+
+
+@router.get("/tmdb/search")
+async def search_tmdb(query: str):
+    result = requests.get(
+        os.environ.get("API_BASE_URL") + f"/search/movie?query={query}",
+        headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
+    )
+    data = result.json()
+    return {
+        "results": [
+            {
+                "title": movie["title"],
+                "id": movie["id"],
+                "release_year": (
+                    int(movie["release_date"][:4])
+                    if movie.get("release_date")
+                    else None
+                ),
+            }
+            for movie in data.get("results", [])
+        ]
+    }

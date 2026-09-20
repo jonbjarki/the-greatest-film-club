@@ -21,26 +21,6 @@ class RegisterInputModel(BaseModel):
     password: str
 
 
-@router.post("/register")
-async def register_user(
-    register_input: RegisterInputModel,
-    session: Annotated[Session, Depends(get_session)],
-):
-    existing_user = session.exec(
-        select(User).where(User.username == register_input.username)
-    ).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Username already registered")
-    user = User(
-        username=register_input.username,
-        hashed_password=hash_password(register_input.password),
-    )
-    session.add(user)
-    session.commit()
-    session.refresh(user)
-    return {"username": user.username}
-
-
 @router.get("/me")
 async def read_users_me(
     current_user: Annotated[User, Depends(get_current_active_user)],

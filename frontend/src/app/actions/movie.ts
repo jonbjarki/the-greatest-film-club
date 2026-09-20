@@ -2,6 +2,8 @@
 
 import { authenticatedFetch } from "@/lib/auth"
 import { updateTag } from "next/cache";
+import z from "zod";
+import { movieSearchResponseSchema } from "@/lib/schemas";
 
 export async function voteForMovie(movieId: number, initialState: any, formData: FormData) {
     const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}/vote`, {
@@ -16,4 +18,26 @@ export async function voteForMovie(movieId: number, initialState: any, formData:
     }
     updateTag("movies");
     return { message: "Vote submitted", error: false };
+}
+
+export async function searchForMovie(query: string) {
+    const res = await authenticatedFetch(process.env.API_URL + `/movies/tmdb/search?query=${encodeURIComponent(query)}`);
+    if (!res.ok) {
+        throw new Error(`Failed to search for movies: ${res.statusText}`);
+    }
+    const unvalidated = await res.json()
+    const parsed = movieSearchResponseSchema.parse(unvalidated);
+    return parsed;
+}
+
+export async function addMovie(movieId: number) {
+    const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}`, {
+        method: "POST"
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to add movie: ${res.statusText}`);
+    }
+    updateTag("movies");
+    return { message: "Movie added", error: false };
 }

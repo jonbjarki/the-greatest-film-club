@@ -20,5 +20,18 @@ export const loginResponseSchema = z.object({
     expires_in: z.number()
 });
 
+
+export const movieSearchItemSchema = z.object({
+    id: z.number(),
+    title: z.string(),
+    release_year: z.number().nullable(),
+});
+
+export const movieSearchResponseSchema = z.object({
+    results: z.array(movieSearchItemSchema)
+});
+
 export type Credentials = z.infer<typeof credentialsSchema>;
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
+export type MovieSearchItemType = z.infer<typeof movieSearchItemSchema>;
+export type MovieSearchResponseType = z.infer<typeof movieSearchResponseSchema>;

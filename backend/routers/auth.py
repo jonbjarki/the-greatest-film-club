@@ -1,10 +1,18 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session
+from sqlmodel import Session, select
 from typing_extensions import Annotated
 
-from ..auth import ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, create_access_token
+from ..models.user import User
+from ..routers.users import RegisterInputModel
+
+from ..auth import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    authenticate_user,
+    create_access_token,
+    hash_password,
+)
 from ..database import get_session
 
 router = APIRouter(tags=["auth"], prefix="/auth")
@@ -32,3 +40,23 @@ async def login(
         "token_type": "bearer",
         "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # convert minutes to seconds
     }
+
+
+@router.post("/register")
+async def register_user(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    session: Annotated[Session, Depends(get_session)],
+):
+    existing_user = session.exec(
+        select(User).where(User.username == form_data.username)
+    ).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already registered")
+    user = User(
+        username=form_data.username,
+        hashed_password=hash_password(form_data.password),
+    )
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+    return {"username": user.username}
