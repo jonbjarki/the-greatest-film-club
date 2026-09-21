@@ -20,6 +20,18 @@ export async function voteForMovie(movieId: number, initialState: any, formData:
     return { message: "Vote submitted", error: false };
 }
 
+export async function unvoteForMovie(movieId: number) {
+    const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}/unvote`, {
+        method: "POST"
+    });
+
+    if (!res.ok) {
+        throw new Error(`Failed to unvote for movie: ${res.statusText}`);
+    }
+
+    updateTag("movies");
+    return { message: "Vote removed", error: false };
+}
 export async function searchForMovie(query: string) {
     const res = await authenticatedFetch(process.env.API_URL + `/movies/tmdb/search?query=${encodeURIComponent(query)}`);
     if (!res.ok) {
@@ -30,12 +42,16 @@ export async function searchForMovie(query: string) {
     return parsed;
 }
 
-export async function addMovie(movieId: number) {
+export async function addMovie(prevState: any, formData: FormData) {
+    const movieId = Number(formData.get("movieId"));
     const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}`, {
         method: "POST"
     });
 
     if (!res.ok) {
+        if (res.status == 409) {
+            return { message: "Movie already added", error: true };
+        }
         throw new Error(`Failed to add movie: ${res.statusText}`);
     }
     updateTag("movies");

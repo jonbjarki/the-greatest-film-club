@@ -1,13 +1,17 @@
 $kind: http-request
-url: "{{base_url}}/users/register"
+url: "{{base_url}}/auth/register"
 method: POST
 body:
-  type: json
-  content: "{\r
-
-    \    \"username\": \"nonni\",\r
-
-    \    \"password\": \"Abc.123\"\r
-
-    }"
+  type: formdata
+  content:
+    - type: text
+      key: username
+      value: nonni
+      description: ""
+      disabled: false
+    - type: text
+      key: password
+      value: Abc.123
+      description: ""
+      disabled: false
 order: 1789603235996

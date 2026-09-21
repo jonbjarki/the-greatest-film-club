@@ -1,17 +1,24 @@
 "use client"
-import { useDeferredValue, useEffect, useState } from "react";
+import { useActionState, useDeferredValue, useEffect, useState, } from "react";
 import { Input } from "../ui/input";
 import { addMovie, searchForMovie } from "@/app/actions/movie";
 import { MovieSearchItemType } from "@/lib/schemas";
 import { Button } from "../ui/button";
+import MovieSearchItem from "./movie-search-item";
+import { toast } from "sonner";
+
+const initialState = {
+    message: "",
+    error: false,
+};
 
 export default function MovieSearchInput({ closeDialog }: { closeDialog: () => void }) {
     const [search, setSearch] = useState("");
     const [results, setResults] = useState<MovieSearchItemType[]>([])
     const deferred = useDeferredValue(search);
+    const [state, formAction, pending] = useActionState(addMovie, initialState);
 
     useEffect(() => {
-        console.log("Ran with: ", deferred);
         const searchFunction = async () => {
             const res = await searchForMovie(deferred);
             setResults(res.results);
@@ -20,20 +27,29 @@ export default function MovieSearchInput({ closeDialog }: { closeDialog: () => v
         searchFunction();
     }, [deferred])
 
+    useEffect(() => {
+        if (state.message) {
+            if (state.error) {
+                toast.error(state.message);
+            } else {
+                toast.success(state.message);
+                closeDialog();
+            }
+        }
+    }, [state]);
+
 
     return (
         <div>
             <Input type="search" className="bg-white rounded-sm p-4" placeholder="Search for a movie.." value={search} onChange={(e) => setSearch(e.target.value)} />
-            <ul>
-                {results.map(
-                    movie =>
-                        <Button key={movie.id} onClick={() => {
-                            addMovie.bind(null, movie.id)();
-                            closeDialog();
-                        }} variant="outline" className="bg-background p-2 m-1 w-full justify-start">{movie.title} ({movie.release_year}) </Button>
-                )}
-            </ul>
-        </div>
+            <form action={formAction}>
+                <ul>
+                    {results.map(
+                        movie => <MovieSearchItem key={movie.id} movie={movie} pending={pending} />
+                    )}
+                </ul>
+            </form>
+        </div >
 
     )
 }

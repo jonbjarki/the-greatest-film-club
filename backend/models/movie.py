@@ -18,7 +18,7 @@ class Movie(SQLModel, table=True):
     director_names: List[str] = Field(default_factory=list, sa_type=ARRAY(String))
     backdrop_url: str | None = None
     poster_url: str | None = None
-    user_id: int | None = Field(foreign_key="user.id")
-    user: User | None = Relationship(back_populates="added_movies")
+    user_id: int = Field(foreign_key="user.id")
+    user: User = Relationship(back_populates="added_movies")
     added_at: datetime = Field(default_factory=datetime.now)
     votes: List["Vote"] = Relationship(back_populates="movie")

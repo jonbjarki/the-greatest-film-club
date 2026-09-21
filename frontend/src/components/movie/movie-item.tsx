@@ -1,20 +1,16 @@
 "use client"
 import { Card, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
 import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { MovieType } from "@/types/movie-types";
 import Image from "next/image"
 import { Badge } from "../ui/badge";
 import VoteForm from "./vote-form";
 import { useState } from "react";
+import { MovieItemType } from "@/lib/schemas";
 
-export default function MovieItem({ movie }: { movie: MovieType }) {
-    const [open, setOpen] = useState(false);
-    const handleOpenChange = (open: boolean) => {
-        setOpen(open);
-    }
+export default function MovieItem({ movie }: { movie: MovieItemType }) {
     return (
         <li>
-            <Dialog open={open} onOpenChange={handleOpenChange}>
+            <Dialog>
                 <DialogTrigger asChild>
                     <Card className="cursor-pointer gap-0 py-0 hover:bg-accent/50 transition-colors h-full">
                         <div className="relative aspect-video w-full">
@@ -64,12 +60,14 @@ export default function MovieItem({ movie }: { movie: MovieType }) {
                         </p>
                     </div>
 
-                    <DialogFooter className="w-full">
-                        <Badge>{movie.vote_count} votes</Badge>
-                        <VoteForm movieId={movie.id} closeDialog={() => {
-                            console.log("CLOSING");
-                            setOpen(false);
-                        }} />
+                    <DialogFooter>
+                        <div className="w-full flex justify-between items-center">
+                            <p className="text-xs w-fit">Added by: {movie.added_by}</p>
+                            <div className="flex items-center gap-2 w-fit">
+                                <Badge>{movie.vote_count} votes</Badge>
+                                <VoteForm movieId={movie.id} userVoted={movie.user_voted} />
+                            </div>
+                        </div>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
