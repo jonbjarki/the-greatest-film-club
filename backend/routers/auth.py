@@ -15,7 +15,7 @@ from auth import (
 )
 from database import get_session
 
-router = APIRouter(tags=["auth"], prefix="/auth")
+router = APIRouter(tags=["auth"], prefix="/api/auth")
 
 
 @router.post("/login")

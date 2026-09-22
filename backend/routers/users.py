@@ -13,7 +13,7 @@ from auth import (
 from database import get_session
 from models.user import User
 
-router = APIRouter(tags=["users"], prefix="/users")
+router = APIRouter(tags=["users"], prefix="/api/users")
 
 
 class RegisterInputModel(BaseModel):
