@@ -27,14 +27,14 @@ app.include_router(auth.router)
 
 @app.get("/backend/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok1"}
 
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok2"}
 
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok3"}
