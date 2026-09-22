@@ -15,7 +15,7 @@ PAGE_SIZE = 10
 
 
 def build_tmdb_image_url(path: str | None) -> str | None:
-    return f"https://image.tmdb.org/t/p/w500/{path}" if path else None
+    return f"https://image.tmdb.org/t/p/w500{path}" if path else None
 
 
 def get_tmdb_movie(id: int):
