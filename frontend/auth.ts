@@ -1,10 +1,14 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
-import z from "zod"
+import { LoginResponse } from "./src/lib/schemas";
 
-import { credentialsSchema, LoginResponse, loginResponseSchema, passwordSchema } from "./src/lib/schemas";
+
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+    pages: {
+        signIn: "/login",
+    },
     providers: [
         Credentials({
             name: "username",
@@ -40,7 +44,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     console.log("Received response", response)
                     console.log("Response body", await response.clone().text())
                     if (!response.ok) {
-                        console.error("Login failed", response.status, response.statusText)
+                        if (response.status === 401) {
+                            console.error("Invalid username or password")
+                            return null
+                        } else {
+                            console.error("Login failed", response.status, response.statusText)
+                        }
                         return null
                     }
 
@@ -60,8 +69,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     }
 
                 } catch (error) {
-                    console.error("Error occured when logging in with backend", error);
-                    return null;
+                    console.error("Error occured when logging in with backend", error)
+                    return null
                 }
             },
         }),
