@@ -37,7 +37,7 @@ def get_tmdb_credits(id: int):
 router = APIRouter(prefix="/movies", tags=["movies"])
 
 
-@router.get("/")
+@router.get("")
 async def list_movies(
     current_user: Annotated[User, Depends(get_current_active_user)],
     page: int | None = 1,

@@ -12,7 +12,7 @@
             "rewrites": [
                 {
                     "source": "/backend/:path(.*)?",
-                    "destination": "/:path/"
+                    "destination": "/:path"
                 }
             ]
         }
