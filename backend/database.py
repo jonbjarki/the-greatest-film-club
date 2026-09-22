@@ -16,7 +16,7 @@ def get_session():
 
 load_dotenv()
 
-sync_url = os.environ.get("DB_URL")
+sync_url = os.environ.get("DATABASE_URL")
 engine = create_engine(sync_url, echo=True)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")

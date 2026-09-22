@@ -20,7 +20,7 @@ def build_tmdb_image_url(path: str | None) -> str | None:
 
 def get_tmdb_movie(id: int):
     result = requests.get(
-        os.environ.get("API_BASE_URL") + f"/movie/{id}",
+        os.environ.get("TMDB_BASE_URL") + f"/movie/{id}",
         headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
     )
     return result.json()
@@ -28,7 +28,7 @@ def get_tmdb_movie(id: int):
 
 def get_tmdb_credits(id: int):
     result = requests.get(
-        os.environ.get("API_BASE_URL") + f"/movie/{id}/credits",
+        os.environ.get("TMDB_BASE_URL") + f"/movie/{id}/credits",
         headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
     )
     return result.json()
@@ -184,7 +184,7 @@ async def unvote_movie(
 @router.get("/tmdb/search")
 async def search_tmdb(query: str):
     result = requests.get(
-        os.environ.get("API_BASE_URL") + f"/search/movie?query={query}",
+        os.environ.get("TMDB_BASE_URL") + f"/search/movie?query={query}",
         headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
     )
     data = result.json()
