@@ -10,7 +10,10 @@
             "framework": "fastapi",
             "entrypoint": "main:app",
             "rewrites": [
-                { "source": "/backend/:path(.*)?", "destination": "/:path" }
+                {
+                    "source": "/backend/:path(.*)?",
+                    "destination": "/:path"
+                }
             ]
         }
     },
