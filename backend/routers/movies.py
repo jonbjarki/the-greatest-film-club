@@ -34,7 +34,7 @@ def get_tmdb_credits(id: int):
     return result.json()
 
 
-router = APIRouter(prefix="/api/movies", tags=["movies"])
+router = APIRouter(prefix="/movies", tags=["movies"])
 
 
 @router.get("/")

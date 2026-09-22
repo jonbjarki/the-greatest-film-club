@@ -23,3 +23,18 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(movies.router)
 app.include_router(users.router)
 app.include_router(auth.router)
+
+
+@app.get("/backend/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}
