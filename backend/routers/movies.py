@@ -4,12 +4,12 @@ from sqlmodel import Session, func, select
 import requests
 import os
 
-from ..response_models.movies import MovieListResponse
-from ..auth import get_current_active_user
-from ..database import engine
-from ..models.movie import Movie
-from ..models.user import User
-from ..models.vote import Vote
+from response_models.movies import MovieListResponse
+from auth import get_current_active_user
+from database import engine
+from models.movie import Movie
+from models.user import User
+from models.vote import Vote
 
 PAGE_SIZE = 10
 

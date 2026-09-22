@@ -4,14 +4,14 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 from typing_extensions import Annotated
 
-from ..auth import (
+from auth import (
     create_access_token,
     authenticate_user,
     get_current_active_user,
     hash_password,
 )
-from ..database import get_session
-from ..models.user import User
+from database import get_session
+from models.user import User
 
 router = APIRouter(tags=["users"], prefix="/users")
 

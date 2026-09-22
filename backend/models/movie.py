@@ -2,10 +2,10 @@ from datetime import datetime
 from typing import TYPE_CHECKING, List
 from sqlmodel import ARRAY, Field, ForeignKey, Relationship, SQLModel, String
 
-from .user import User
+from models.user import User
 
 if TYPE_CHECKING:
-    from .vote import Vote
+    from models.vote import Vote
 
 
 class Movie(SQLModel, table=True):

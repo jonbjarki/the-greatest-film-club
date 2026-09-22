@@ -7,8 +7,8 @@ from passlib.context import CryptContext
 from sqlmodel import Session, select
 from typing_extensions import Annotated
 
-from .database import get_session, oauth2_scheme
-from .models.user import User
+from database import get_session, oauth2_scheme
+from models.user import User
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 ALGORITHM = "HS256"

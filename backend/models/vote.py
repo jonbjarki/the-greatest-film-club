@@ -1,11 +1,11 @@
 from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
-from .movie import Movie
+from models.movie import Movie
 
 if TYPE_CHECKING:
-    from .user import User
-    from .movie import Movie
+    from models.user import User
+    from models.movie import Movie
 
 
 class Vote(SQLModel, table=True):

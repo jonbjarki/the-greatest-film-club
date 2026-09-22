@@ -6,10 +6,10 @@ from fastapi.concurrency import asynccontextmanager
 from sqlmodel import SQLModel, Session
 import requests
 import os
-from .database import engine, oauth2_scheme, create_db_and_tables
-from .routers import movies, users, auth
+from database import engine, oauth2_scheme, create_db_and_tables
+from routers import movies, users, auth
 
-from .models.movie import Movie
+from models.movie import Movie
 
 
 @asynccontextmanager

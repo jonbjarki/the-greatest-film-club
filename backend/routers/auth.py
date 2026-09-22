@@ -4,16 +4,16 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlmodel import Session, select
 from typing_extensions import Annotated
 
-from ..models.user import User
-from ..routers.users import RegisterInputModel
+from models.user import User
+from routers.users import RegisterInputModel
 
-from ..auth import (
+from auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     authenticate_user,
     create_access_token,
     hash_password,
 )
-from ..database import get_session
+from database import get_session
 
 router = APIRouter(tags=["auth"], prefix="/auth")
 
