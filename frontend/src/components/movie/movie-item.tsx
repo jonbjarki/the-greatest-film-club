@@ -4,7 +4,6 @@ import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTrigger, Dialo
 import Image from "next/image"
 import { Badge } from "../ui/badge";
 import VoteForm from "./vote-form";
-import { useState } from "react";
 import { MovieItemType } from "@/lib/schemas";
 
 export default function MovieItem({ movie }: { movie: MovieItemType }) {

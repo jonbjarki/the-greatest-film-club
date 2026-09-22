@@ -24,7 +24,7 @@ export default function VoteForm({ movieId, userVoted }: { movieId: number, user
                 redirect("/");
             }
         }
-    }, [state.message])
+    }, [state.message, state.error])
     return (
         <form action={formAction}>
             {userVoted ? <Button type="submit" disabled={pending} variant="destructive">Unvote</Button> : <Button type="submit" disabled={pending}>Vote</Button>}

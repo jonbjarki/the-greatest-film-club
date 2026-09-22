@@ -1,5 +1,5 @@
 import MovieList from "@/components/movie/movie-list";
-import { auth, signOut } from "../../auth";
+import { auth } from "../../auth";
 import Link from "next/link";
 import { Button } from "@/components/ui/button"
 import AddMovieButton from "@/components/add-movie/add-movie-button";

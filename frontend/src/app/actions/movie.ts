@@ -2,10 +2,16 @@
 
 import { authenticatedFetch } from "@/lib/auth"
 import { updateTag } from "next/cache";
-import z from "zod";
 import { movieSearchResponseSchema } from "@/lib/schemas";
 
-export async function voteForMovie(movieId: number, initialState: any, formData: FormData) {
+export type MovieActionState = {
+    message: string,
+    error: boolean,
+}
+
+export async function voteForMovie(movieId: number, _initialState: MovieActionState, _formData: FormData): Promise<MovieActionState> {
+    void _initialState;
+    void _formData;
     const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}/vote`, {
         method: "POST"
     });
@@ -20,7 +26,7 @@ export async function voteForMovie(movieId: number, initialState: any, formData:
     return { message: "Vote submitted", error: false };
 }
 
-export async function unvoteForMovie(movieId: number) {
+export async function unvoteForMovie(movieId: number): Promise<MovieActionState> {
     const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}/unvote`, {
         method: "POST"
     });
@@ -42,7 +48,8 @@ export async function searchForMovie(query: string) {
     return parsed;
 }
 
-export async function addMovie(prevState: any, formData: FormData) {
+export async function addMovie(_prevState: MovieActionState, formData: FormData): Promise<MovieActionState> {
+    void _prevState;
     const movieId = Number(formData.get("movieId"));
     const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}`, {
         method: "POST"

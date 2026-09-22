@@ -16,6 +16,10 @@ export type SignUpState = {
     }
 }
 
+export type SignInState = {
+    error: string,
+}
+
 export async function signUpAction(_state: SignUpState, formData: FormData): Promise<SignUpState> {
     const data = {
         username: formData.get("username"),
@@ -56,9 +60,14 @@ export async function signUpAction(_state: SignUpState, formData: FormData): Pro
         password: formData.get("password"),
         redirectTo: "/"
     });
+
+    return {
+        error: null,
+        message: "",
+    };
 }
 
-export async function signInAction(initialState: any, formData: FormData) {
+export async function signInAction(_state: SignInState, formData: FormData) {
     try {
         await signIn("credentials", {
             username: formData.get("username"),

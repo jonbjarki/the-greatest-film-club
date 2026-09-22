@@ -1,4 +1,4 @@
-import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationEllipsis, PaginationNext } from "../ui/pagination";
+import { Pagination, PaginationContent, PaginationItem, PaginationPrevious, PaginationLink, PaginationNext } from "../ui/pagination";
 
 export default function MovieListPagination({ page, totalPages }: { page: number, totalPages: number }) {
     return (

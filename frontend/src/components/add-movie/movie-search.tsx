@@ -3,7 +3,6 @@ import { useActionState, useDeferredValue, useEffect, useState, } from "react";
 import { Input } from "../ui/input";
 import { addMovie, searchForMovie } from "@/app/actions/movie";
 import { MovieSearchItemType } from "@/lib/schemas";
-import { Button } from "../ui/button";
 import MovieSearchItem from "./movie-search-item";
 import { toast } from "sonner";
 
@@ -36,7 +35,7 @@ export default function MovieSearchInput({ closeDialog }: { closeDialog: () => v
                 closeDialog();
             }
         }
-    }, [state]);
+    }, [state, closeDialog]);
 
 
     return (
