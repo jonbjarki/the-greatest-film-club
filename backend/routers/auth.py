@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import Annotated
 
 from models.user import User
@@ -21,9 +22,9 @@ router = APIRouter(tags=["auth"], prefix="/auth")
 @router.post("/login")
 async def login(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    session: Annotated[Session, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
 ):
-    user = authenticate_user(session, form_data.username, form_data.password)
+    user = await authenticate_user(session, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -47,7 +48,7 @@ async def register_user(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     session: Annotated[Session, Depends(get_session)],
 ):
-    existing_user = session.exec(
+    existing_user = await session.exec(
         select(User).where(User.username == form_data.username)
     ).first()
     if existing_user:
@@ -56,7 +57,7 @@ async def register_user(
         username=form_data.username,
         hashed_password=hash_password(form_data.password),
     )
-    session.add(user)
-    session.commit()
-    session.refresh(user)
+    await session.add(user)
+    await session.commit()
+    await session.refresh(user)
     return {"username": user.username}

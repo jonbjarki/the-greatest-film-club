@@ -14,7 +14,7 @@ from models.movie import Movie
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    create_db_and_tables()
+    await create_db_and_tables()
     yield
     engine.dispose()
 
@@ -25,16 +25,6 @@ app.include_router(users.router)
 app.include_router(auth.router)
 
 
-@app.get("/backend/health")
-def health1():
-    return {"status": "ok1"}
-
-
 @app.get("/health")
-def health2():
+def health():
     return {"status": "ok2"}
-
-
-@app.get("/api/health")
-def health3():
-    return {"status": "ok3"}

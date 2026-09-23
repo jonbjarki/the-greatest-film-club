@@ -6,7 +6,7 @@ import os
 
 from response_models.movies import MovieListResponse
 from auth import get_current_active_user
-from database import engine
+from database import engine, get_session
 from models.movie import Movie
 from models.user import User
 from models.vote import Vote
@@ -43,7 +43,7 @@ async def list_movies(
     page: int | None = 1,
 ) -> MovieListResponse:
     with Session(engine) as session:
-        count = session.exec(select(func.count(Movie.id))).first() or 0
+        count = await session.exec(select(func.count(Movie.id))).first() or 0
 
         vote_count_subq = (
             select(Vote.movie_id, func.count(Vote.user_id).label("vote_count"))
@@ -57,11 +57,11 @@ async def list_movies(
             .offset((page - 1) * PAGE_SIZE)
             .limit(PAGE_SIZE)
         )
-        rows = session.exec(statement).all()
+        rows = await session.exec(statement).all()
         movie_ids = [movie.id for movie, _ in rows]
 
         voted_ids = set(
-            session.exec(
+            await session.exec(
                 select(Vote.movie_id).where(
                     Vote.user_id == current_user.id, Vote.movie_id.in_(movie_ids)
                 )
@@ -91,8 +91,8 @@ async def add_movie_from_tmdb(
     current_user: Annotated[User, Depends(get_current_active_user)],
     response: Response,
 ):
-    with Session(engine) as session:
-        existing_movie = session.get(Movie, id)
+    async with get_session() as session:
+        existing_movie = await session.get(Movie, id)
         if existing_movie:
             response.status_code = 409
             return {"error": "Movie already exists"}
@@ -122,10 +122,10 @@ async def add_movie_from_tmdb(
         user_id=current_user.id,
     )
 
-    with Session(engine) as session:
-        session.add(new_movie)
-        session.commit()
-        session.refresh(new_movie)
+    async with get_session() as session:
+        await session.add(new_movie)
+        await session.commit()
+        await session.refresh(new_movie)
         print(f"Created movie with ID: {new_movie.id}")
 
     response.headers["Location"] = f"/movies/{new_movie.id}"
@@ -138,12 +138,12 @@ async def vote_movie(
     response: Response,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
-    with Session(engine) as session:
-        movie = session.get(Movie, id)
+    async with get_session() as session:
+        movie = await session.get(Movie, id)
         if not movie:
             response.status_code = 404
             return {"error": "Movie not found"}
-        existing_vote = session.exec(
+        existing_vote = await session.exec(
             select(Vote).where(Vote.user_id == current_user.id, Vote.movie_id == id)
         ).first()
         if existing_vote:
@@ -151,9 +151,9 @@ async def vote_movie(
             return {"error": "User has already voted for this movie"}
 
         new_vote = Vote(user_id=current_user.id, movie_id=id)
-        session.add(new_vote)
-        session.commit()
-        session.refresh(new_vote)
+        await session.add(new_vote)
+        await session.commit()
+        await session.refresh(new_vote)
         return {"message": f"User {current_user.id} voted for movie {id}"}
 
 
@@ -163,21 +163,21 @@ async def unvote_movie(
     response: Response,
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
-    with Session(engine) as session:
-        movie = session.get(Movie, id)
+    async with get_session() as session:
+        movie = await session.get(Movie, id)
         if not movie:
             response.status_code = 404
             return {"error": "Movie not found"}
 
-        existing_vote = session.exec(
+        existing_vote = await session.exec(
             select(Vote).where(Vote.user_id == current_user.id, Vote.movie_id == id)
         ).first()
         if not existing_vote:
             response.status_code = 404
             return {"error": "Vote not found"}
 
-        session.delete(existing_vote)
-        session.commit()
+        await session.delete(existing_vote)
+        await session.commit()
         return {"message": f"User {current_user.id} removed vote for movie {id}"}
 
 
