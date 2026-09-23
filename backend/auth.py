@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from sqlmodel import Session, select
+from sqlmodel import select
 from typing_extensions import Annotated
 from sqlmodel.ext.asyncio.session import AsyncSession
 from database import get_session, oauth2_scheme
@@ -50,8 +50,17 @@ async def authenticate_user(
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "type": "access"})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+def create_refresh_token(data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    expire = datetime.now(timezone.utc) + (expires_delta or timedelta(days=7))
+    to_encode.update({"exp": expire, "type": "refresh"})
+    return jwt.encode(
+        to_encode, os.environ.get("REFRESH_SECRET_KEY"), algorithm=ALGORITHM
+    )
 
 
 async def get_current_user(

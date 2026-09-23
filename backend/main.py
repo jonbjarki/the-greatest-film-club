@@ -3,7 +3,7 @@ from fastapi import Depends
 
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
-from sqlmodel import SQLModel, Session
+from sqlmodel import SQLModel
 import requests
 import os
 from database import engine, oauth2_scheme, create_db_and_tables
@@ -16,7 +16,7 @@ from models.movie import Movie
 async def lifespan(app: FastAPI):
     await create_db_and_tables()
     yield
-    engine.dispose()
+    await engine.dispose()
 
 
 app = FastAPI(lifespan=lifespan)

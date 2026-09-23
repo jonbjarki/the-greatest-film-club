@@ -1,12 +1,14 @@
 import os
+from typing import Annotated, AsyncGenerator
 from dotenv import load_dotenv
+from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
+    async_sessionmaker,
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.orm import sessionmaker
 
 
 async def create_db_and_tables():
@@ -15,8 +17,11 @@ async def create_db_and_tables():
         await conn.run_sync(SQLModel.metadata.create_all)
 
 
-async def get_session() -> AsyncSession:
-    async with AsyncSession(engine) as session:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
+    async_session = async_sessionmaker(
+        bind=engine, class_=AsyncSession, expire_on_commit=False
+    )
+    async with async_session() as session:
         yield session
 
 
