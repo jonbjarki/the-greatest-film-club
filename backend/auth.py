@@ -7,10 +7,11 @@ from passlib.context import CryptContext
 from sqlmodel import select
 from typing_extensions import Annotated
 from sqlmodel.ext.asyncio.session import AsyncSession
+from config import Config
 from database import get_session, oauth2_scheme
 from models.user import User
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = Config.SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
@@ -59,7 +60,7 @@ def create_refresh_token(data: dict, expires_delta: timedelta = None):
     expire = datetime.now(timezone.utc) + (expires_delta or timedelta(days=7))
     to_encode.update({"exp": expire, "type": "refresh"})
     return jwt.encode(
-        to_encode, os.environ.get("REFRESH_SECRET_KEY"), algorithm=ALGORITHM
+        to_encode, Config.REFRESH_SECRET_KEY, algorithm=ALGORITHM
     )
 
 

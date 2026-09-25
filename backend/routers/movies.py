@@ -5,6 +5,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 import requests
 import os
 
+from config import Config
 from response_models.movies import MovieListResponse
 from auth import get_current_active_user
 from database import engine, get_session
@@ -13,7 +14,7 @@ from models.user import User
 from models.vote import Vote
 
 PAGE_SIZE = 10
-
+TMDB_BASE_URL = Config.TMDB_BASE_URL
 
 def build_tmdb_image_url(path: str | None) -> str | None:
     return f"https://image.tmdb.org/t/p/w500{path}" if path else None
@@ -21,7 +22,7 @@ def build_tmdb_image_url(path: str | None) -> str | None:
 
 def get_tmdb_movie(id: int):
     result = requests.get(
-        os.environ.get("TMDB_BASE_URL") + f"/movie/{id}",
+        TMDB_BASE_URL + f"/movie/{id}",
         headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
     )
     return result.json()
@@ -29,7 +30,7 @@ def get_tmdb_movie(id: int):
 
 def get_tmdb_credits(id: int):
     result = requests.get(
-        os.environ.get("TMDB_BASE_URL") + f"/movie/{id}/credits",
+        TMDB_BASE_URL + f"/movie/{id}/credits",
         headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
     )
     return result.json()
@@ -186,7 +187,7 @@ async def unvote_movie(
 @router.get("/tmdb/search")
 async def search_tmdb(query: str):
     result = requests.get(
-        os.environ.get("TMDB_BASE_URL") + f"/search/movie?query={query}",
+        TMDB_BASE_URL + f"/search/movie?query={query}",
         headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
     )
     data = result.json()

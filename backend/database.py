@@ -10,6 +10,8 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from config import Config
+
 
 async def create_db_and_tables():
     async with engine.begin() as conn:
@@ -27,7 +29,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
 
 load_dotenv()
 
-sync_url = os.environ.get("DATABASE_URL")
+sync_url = Config.DATABASE_URL
 engine = create_async_engine(sync_url, echo=True, future=True)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
