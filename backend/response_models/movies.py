@@ -1,7 +1,9 @@
-from pydantic import BaseModel
+from uuid import UUID
+
+from sqlmodel import SQLModel
 
 
-class MovieDetails(BaseModel):
+class MovieDetails(SQLModel):
     id: int
     name: str
     description: str | None
@@ -11,14 +13,14 @@ class MovieDetails(BaseModel):
     backdrop_url: str | None
     poster_url: str | None
     release_year: int | None
-    user_id: int
+    user_id: UUID
     added_at: str
     added_by: str | None
     vote_count: int
     user_voted: bool
 
 
-class MovieListResponse(BaseModel):
+class MovieListResponse(SQLModel):
     results: list[MovieDetails]
     page: int
     total_pages: int

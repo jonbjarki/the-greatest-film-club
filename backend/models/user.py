@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from typing import List
 from typing import TYPE_CHECKING
+import uuid
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
@@ -9,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class User(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: uuid.UUID | None = Field(default=uuid.uuid7(), primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
     is_admin: bool = False
