@@ -29,6 +29,7 @@ export const loginResponseSchema = z.object({
         email: z.string().optional(),
     }),
     access_token: z.string(),
+    refresh_token: z.string(),
     token_type: z.string(),
     expires_in: z.number()
 });
@@ -43,7 +44,7 @@ export const movieItemSchema = z.object({
     description: z.string(),
     backdrop_url: z.string(),
     poster_url: z.string(),
-    user_id: z.number(),
+    user_id: z.string(),
     added_at: z.coerce.date(),
     added_by: z.string(),
     vote_count: z.number(),

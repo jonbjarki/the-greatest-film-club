@@ -14,7 +14,6 @@ async function fetchMovies(page: number) {
 
     const unvalidated = await res.json();
     const data = movieListResponseSchema.parse(unvalidated);
-    console.log("Validated data:", data);
     return data;
 
 }

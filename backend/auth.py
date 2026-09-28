@@ -15,7 +15,7 @@ from models.user import User
 SECRET_KEY = Config.SECRET_KEY
 REFRESH_SECRET_KEY = Config.REFRESH_SECRET_KEY
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1  # 1 minute for testing purposes
+ACCESS_TOKEN_EXPIRE_MINUTES = 0.5  # 30 seconds for testing purposes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")

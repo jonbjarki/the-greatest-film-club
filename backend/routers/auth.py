@@ -51,20 +51,20 @@ async def login(
     )
     await save_refresh_session(session, user.id, str(jti), expires_at=expires_at)
 
-    # Set the refresh token as a cookie
-    response.set_cookie(
-        key="refresh_cookie",
-        value=refresh_token,
-        httponly=True,
-        max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    )
+    # # Set the refresh token as a cookie
+    # response.set_cookie(
+    #     key="refresh_cookie",
+    #     value=refresh_token,
+    #     httponly=True,
+    #     max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
+    # )
     return {
         "user": {
             "username": user.username,
             "id": user.id,
         },
         "access_token": access_token,
-        "token_type": "bearer",
+        "refresh_token": refresh_token,
         "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # convert minutes to seconds
         "refresh_expires_in": 60 * 60 * 24 * 7,  # 7 days in seconds
     }
@@ -94,11 +94,11 @@ async def register_user(
 @router.post("/refresh")
 async def refresh_token(
     session: Annotated[AsyncSession, Depends(get_session)],
-    refresh_cookie: Annotated[str, Cookie()],
+    refresh_token: str,
     response: Response,
 ):
     # Decode the refresh token to extract its payload
-    payload = decode_refresh_token(refresh_cookie)
+    payload = decode_refresh_token(refresh_token)
     jti = payload["jti"]
     user_id = str(payload["sub"])
 
@@ -106,7 +106,10 @@ async def refresh_token(
         raise HTTPException(status_code=401, detail="Invalid refresh token")
 
     refresh_session = await get_refresh_session(session, jti, user_id)
-
+    print(f"Decoded refresh token payload: {payload}")
+    print(f"Refresh session: {refresh_session}")
+    print("JTI:", jti)
+    print("User ID:", user_id)
     # Check if the refresh session exists and is valid
     if not refresh_session:
         raise HTTPException(status_code=401, detail="Refresh token is invalid")
@@ -125,16 +128,15 @@ async def refresh_token(
         session, payload["sub"], str(new_jti), expires_at=expires_at
     )
 
-    response.set_cookie(
-        "refresh_cookie",
-        refresh_token,
-        httponly=True,
-        max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    )
+    # response.set_cookie(
+    #     "refresh_cookie",
+    #     refresh_token,
+    #     httponly=True,
+    #     max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
+    # )
 
     return {
         "access_token": access_token,
-        "token_type": "bearer",
+        "refresh_token": refresh_token,
         "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # convert minutes to seconds
-        "refresh_expires_in": 60 * 60 * 24 * 7,  # 7 days in seconds
     }
