@@ -4,8 +4,7 @@ import { authenticatedFetch } from "@/lib/auth";
 import MovieListPagination from "./movie-list-pagination";
 
 async function fetchMovies(page: number) {
-    const url = new URL(process.env.API_URL + "/movies");
-    url.searchParams.append("page", page.toString());
+    const url = `/movies?page=${page}`;
     const res = await authenticatedFetch(url, {
         next: {
             tags: ["movies"]

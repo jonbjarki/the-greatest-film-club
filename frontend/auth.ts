@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { LoginResponse } from "./src/lib/schemas";
+import { API_URL } from "./src/lib/utils";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     pages: {
@@ -32,7 +33,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     const body = new FormData()
                     body.append("username", credentials.username)
                     body.append("password", credentials.password)
-                    const response = await fetch(process.env.API_URL + `/auth/login`, {
+                    const response = await fetch(API_URL + `/auth/login`, {
                         method: "POST",
                         body: body,
                     })

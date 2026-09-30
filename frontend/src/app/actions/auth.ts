@@ -4,7 +4,7 @@ import { signIn } from "@/../auth";
 import z from "zod";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-
+import { API_URL } from "@/lib/utils";
 export type SignUpState = {
     error: string | null,
     message: string,
@@ -38,7 +38,7 @@ export async function signUpAction(_state: SignUpState, formData: FormData): Pro
         }
     }
 
-    const res = await fetch(process.env.API_URL + `/auth/register`, {
+    const res = await fetch(API_URL + `/auth/register`, {
         method: "POST",
         body: formData
     });

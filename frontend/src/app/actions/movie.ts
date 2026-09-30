@@ -12,7 +12,7 @@ export type MovieActionState = {
 export async function voteForMovie(movieId: number, _initialState: MovieActionState, _formData: FormData): Promise<MovieActionState> {
     void _initialState;
     void _formData;
-    const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}/vote`, {
+    const res = await authenticatedFetch(`/movies/${movieId}/vote`, {
         method: "POST"
     });
 
@@ -27,7 +27,7 @@ export async function voteForMovie(movieId: number, _initialState: MovieActionSt
 }
 
 export async function unvoteForMovie(movieId: number): Promise<MovieActionState> {
-    const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}/unvote`, {
+    const res = await authenticatedFetch(`/movies/${movieId}/unvote`, {
         method: "POST"
     });
 
@@ -39,7 +39,7 @@ export async function unvoteForMovie(movieId: number): Promise<MovieActionState>
     return { message: "Vote removed", error: false };
 }
 export async function searchForMovie(query: string) {
-    const res = await authenticatedFetch(process.env.API_URL + `/movies/tmdb/search?query=${encodeURIComponent(query)}`);
+    const res = await authenticatedFetch(`/movies/tmdb/search?query=${encodeURIComponent(query)}`);
     if (!res.ok) {
         throw new Error(`Failed to search for movies: ${res.statusText}`);
     }
@@ -51,7 +51,7 @@ export async function searchForMovie(query: string) {
 export async function addMovie(_prevState: MovieActionState, formData: FormData): Promise<MovieActionState> {
     void _prevState;
     const movieId = Number(formData.get("movieId"));
-    const res = await authenticatedFetch(process.env.API_URL + `/movies/${movieId}`, {
+    const res = await authenticatedFetch(`/movies/${movieId}`, {
         method: "POST"
     });
 

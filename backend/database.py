@@ -34,9 +34,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
         
 async def get_connection():
-    return await asyncpg.connect(Config.DATABASE_URL, ssl="require")
-        
-load_dotenv()
+    return await asyncpg.connect(Config.DATABASE_URL, ssl="require" if Config.VERCEL_ENV in ["production", "preview"] else None)
 
 
 engine = create_async_engine(

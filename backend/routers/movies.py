@@ -16,6 +16,7 @@ from models.vote import Vote
 
 PAGE_SIZE = 10
 TMDB_BASE_URL = Config.TMDB_BASE_URL
+TMDB_API_KEY = Config.API_KEY
 
 def build_tmdb_image_url(path: str | None) -> str | None:
     return f"https://image.tmdb.org/t/p/w500{path}" if path else None
@@ -24,7 +25,7 @@ def build_tmdb_image_url(path: str | None) -> str | None:
 def get_tmdb_movie(id: int):
     result = requests.get(
         TMDB_BASE_URL + f"/movie/{id}",
-        headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
+        headers={"Authorization": "Bearer " + TMDB_API_KEY},
     )
     return result.json()
 
@@ -32,7 +33,7 @@ def get_tmdb_movie(id: int):
 def get_tmdb_credits(id: int):
     result = requests.get(
         TMDB_BASE_URL + f"/movie/{id}/credits",
-        headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
+        headers={"Authorization": "Bearer " + TMDB_API_KEY},
     )
     return result.json()
 
@@ -194,7 +195,7 @@ async def unvote_movie(
 async def search_tmdb(query: str):
     result = requests.get(
         TMDB_BASE_URL + f"/search/movie?query={query}",
-        headers={"Authorization": "Bearer " + os.environ.get("API_KEY")},
+        headers={"Authorization": "Bearer " + TMDB_API_KEY},
     )
     data = result.json()
     return {

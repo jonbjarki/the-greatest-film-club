@@ -1,5 +1,5 @@
 import { redirect, RedirectType } from "next/navigation";
-import { redirectToLogin } from "@/lib/utils";
+import { API_URL, redirectToLogin } from "@/lib/utils";
 import { decode, getToken } from "next-auth/jwt";
 import { cookies } from "next/headers";
 
@@ -44,7 +44,7 @@ async function getDecodedToken() {
 Utility function for making authenticated requests to the backend API.
 It retrieves the JWT from the encoded session cookie and includes it in the Authorization header of the request. 
 */
-export async function authenticatedFetch(input: URL | RequestInfo, init?: RequestInit) {
+export async function authenticatedFetch(input: string, init?: RequestInit) {
     const accessToken = await getDecodedToken();
     const headers = new Headers(init?.headers || {});
     if (accessToken) {
@@ -54,7 +54,7 @@ export async function authenticatedFetch(input: URL | RequestInfo, init?: Reques
 
     console.log("Making authenticated request to: " + input + " with configuration ", init);
     // Make the authenticated request to the backend API, including the JWT in the Authorization header if available
-    const res = await fetch(input, {
+    const res = await fetch(API_URL + input, {
         ...init,
         headers
     });
