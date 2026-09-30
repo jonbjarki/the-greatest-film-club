@@ -12,3 +12,5 @@ class Settings(BaseSettings):
     )
 
 Config = Settings()
+if ("postgresql+asyncpg://" not in Config.DATABASE_URL):
+    Config.DATABASE_URL = Config.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
