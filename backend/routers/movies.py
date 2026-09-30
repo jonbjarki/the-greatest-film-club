@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Response
 from typing_extensions import Annotated
 from sqlmodel import Session, func, select
+from sqlalchemy.orm import selectinload
 from sqlmodel.ext.asyncio.session import AsyncSession
 import requests
 import os
@@ -55,11 +56,16 @@ async def list_movies(
     )
 
     statement = (
-        select(Movie, func.coalesce(vote_count_subq.c.vote_count, 0))
-        .join(vote_count_subq, vote_count_subq.c.movie_id == Movie.id, isouter=True)
-        .offset((page - 1) * PAGE_SIZE)
-        .limit(PAGE_SIZE)
+    select(Movie, func.coalesce(vote_count_subq.c.vote_count, 0))
+    .options(selectinload(Movie.user))
+    .join(
+        vote_count_subq,
+        vote_count_subq.c.movie_id == Movie.id,
+        isouter=True,
     )
+    .offset((page - 1) * PAGE_SIZE)
+    .limit(PAGE_SIZE)
+)
     movie_rows = (await session.exec(statement)).all()
     movie_ids = [movie.id for movie, _ in movie_rows]
 

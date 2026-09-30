@@ -7,8 +7,8 @@ from routers import movies, users, auth
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await create_db_and_tables()
-    await run_migrations()
+    #await create_db_and_tables()
+    #await run_migrations()
     yield
     await engine.dispose()
 

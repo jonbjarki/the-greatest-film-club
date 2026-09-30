@@ -8,7 +8,7 @@ variables:
     disabled: false
 auth:
   - id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
-    type: oauth2
-    name: OAuth 2.0
+    type: bearer
+    name: Bearer Token
     credentials:
-      addTokenTo: header
+      token: "{{ACCESS_TOKEN}}"

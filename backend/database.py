@@ -1,6 +1,7 @@
 import asyncio
 import os
 from typing import Annotated, AsyncGenerator
+import asyncpg
 from dotenv import load_dotenv
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -15,10 +16,9 @@ from alembic import command
 
 from config import Config
 
-async def run_migrations():
+def run_migrations():
     alembic_cfg = AlembicConfig("alembic.ini")
-    alembic_cfg.set_main_option("sqlalchemy.url", Config.DATABASE_URL)
-    await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
+    command.upgrade(alembic_cfg, "head")
 
 async def create_db_and_tables():
     async with engine.begin() as conn:
@@ -32,11 +32,21 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     )
     async with async_session() as session:
         yield session
-
-
+        
+async def get_connection():
+    return await asyncpg.connect(Config.DATABASE_URL, ssl="require")
+        
 load_dotenv()
 
-sync_url = Config.DATABASE_URL
-engine = create_async_engine(sync_url, echo=True, future=True)
+
+engine = create_async_engine(
+    Config.ASYNC_DATABASE_URL,
+    async_creator=get_connection,
+    echo=True,
+    future=True,
+    pool_pre_ping=True,
+    pool_size=5,
+    max_overflow=10,
+)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
