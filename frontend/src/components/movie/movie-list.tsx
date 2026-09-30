@@ -11,6 +11,11 @@ async function fetchMovies(page: number) {
         }
     });
 
+    if (!res.ok) {
+        console.error("Failed to fetch movies", await res.text());
+        throw new Error(`Failed to fetch movies: ${res.statusText}`);
+    }
+
     const unvalidated = await res.json();
     const data = movieListResponseSchema.parse(unvalidated);
     return data;

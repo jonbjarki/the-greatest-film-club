@@ -73,6 +73,8 @@ async def get_current_user(
         id = payload.get("sub")
         if id is None:
             raise credentials_exception
+        if type(id) is not str:
+            raise credentials_exception
     except JWTError:
         raise credentials_exception
 

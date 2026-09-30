@@ -20,7 +20,9 @@ async function getDecodedToken() {
     // Retrieve the encoded authjs session token from cookies
     const cookieStore = await cookies();
 
-    const cookieName = process.env.NODE_ENV === "production" ? "__Secure-next-auth.session-token" : "authjs.session-token";
+    const cookieName = process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token";
+    console.log("COOKIE NAME:", cookieName);
+    console.log("NODE ENV:", process.env.NODE_ENV);
     const sessionCookie = cookieStore.get(cookieName)?.value;
 
     if (!sessionCookie) return null;
@@ -31,6 +33,8 @@ async function getDecodedToken() {
         secret: process.env.AUTH_SECRET!,
         salt: cookieName, // Use the cookie name as salt for decoding
     });
+    console.log("DECODED TOKEN:", decodedToken);
+    console.log("ACCESS TOKEN: ", Boolean(decodedToken?.accessToken));
 
     if (!decodedToken) {
         return null;

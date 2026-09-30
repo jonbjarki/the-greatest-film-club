@@ -30,12 +30,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     return null
                 }
                 try {
-                    const body = new FormData()
-                    body.append("username", credentials.username)
-                    body.append("password", credentials.password)
+                    console.log("BACKEND URL:", API_URL)
+                    const body = new URLSearchParams({ "username": credentials.username, "password": credentials.password })
                     const response = await fetch(API_URL + `/auth/login`, {
                         method: "POST",
                         body: body,
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
                     })
                     if (!response.ok) {
                         if (response.status === 401) {
