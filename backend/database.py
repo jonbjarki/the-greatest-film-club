@@ -1,3 +1,4 @@
+import asyncio
 import os
 from typing import Annotated, AsyncGenerator
 from dotenv import load_dotenv
@@ -9,9 +10,15 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
 )
 from sqlmodel.ext.asyncio.session import AsyncSession
+from alembic.config import Config as AlembicConfig
+from alembic import command
 
 from config import Config
 
+async def run_migrations():
+    alembic_cfg = AlembicConfig("alembic.ini")
+    alembic_cfg.set_main_option("sqlalchemy.url", Config.DATABASE_URL)
+    await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
 
 async def create_db_and_tables():
     async with engine.begin() as conn:

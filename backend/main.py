@@ -1,20 +1,14 @@
-from typing_extensions import Annotated
-from fastapi import Depends
 
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
-from sqlmodel import SQLModel
-import requests
-import os
-from database import engine, oauth2_scheme, create_db_and_tables
+from database import engine, create_db_and_tables, run_migrations
 from routers import movies, users, auth
-
-from models.movie import Movie
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await create_db_and_tables()
+    await run_migrations()
     yield
     await engine.dispose()
 
