@@ -26,9 +26,7 @@ export async function signUpAction(_state: SignUpState, formData: FormData): Pro
         password: formData.get("password")
     }
 
-    console.log("data", data);
     const result = await credentialsSchema.safeParseAsync(data);
-    console.log(result);
     if (!result.success) {
         const errors = z.flattenError(result.error);
         return {
@@ -45,9 +43,6 @@ export async function signUpAction(_state: SignUpState, formData: FormData): Pro
             "Content-Type": "application/x-www-form-urlencoded"
         }
     });
-    console.log(res);
-    const resData = await res.json();
-    console.log(resData);
     if (!res.ok) {
         if (res.status == 400) {
             return {

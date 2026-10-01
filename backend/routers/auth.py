@@ -42,6 +42,7 @@ async def login(
             "id": user.id,
         },
         "access_token": access_token,
+        "token_type": "bearer",
         "expires_in": ACCESS_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,  # convert days to seconds
     }
 

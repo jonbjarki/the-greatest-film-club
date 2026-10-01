@@ -36,6 +36,10 @@ def upgrade() -> None:
 
     user_pk = inspector.get_pk_constraint("user")
     user_pk_name = user_pk["name"]
+    vote_pk = inspector.get_pk_constraint("vote")
+    vote_pk_name = vote_pk["name"]
+    if vote_pk["constrained_columns"] != ["user_id", "movie_id"]:
+        raise RuntimeError("Expected vote primary key on (user_id, movie_id)")
 
     foreign_keys = {}
 
@@ -173,6 +177,11 @@ def upgrade() -> None:
         "user",
         type_="primary",
     )
+    op.drop_constraint(
+        vote_pk_name,
+        "vote",
+        type_="primary",
+    )
 
     # ---------------------------------------------------------
     # 8. Remove integer columns
@@ -210,6 +219,11 @@ def upgrade() -> None:
         user_pk_name,
         "user",
         ["id"],
+    )
+    op.create_primary_key(
+        vote_pk_name,
+        "vote",
+        ["user_id", "movie_id"],
     )
 
     # ---------------------------------------------------------

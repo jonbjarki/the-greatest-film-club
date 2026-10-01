@@ -30,7 +30,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                     return null
                 }
                 try {
-                    console.log("BACKEND URL:", API_URL)
                     const body = new URLSearchParams({ "username": credentials.username, "password": credentials.password })
                     const response = await fetch(API_URL + `/auth/login`, {
                         method: "POST",
