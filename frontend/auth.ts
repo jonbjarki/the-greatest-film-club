@@ -1,9 +1,7 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { LoginResponse } from "./src/lib/schemas";
-
-
-
+import { API_URL } from "./src/lib/utils";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     pages: {
@@ -24,25 +22,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             },
 
             async authorize(credentials) {
-                console.log("Authorizing credentials", credentials)
                 if (
                     typeof credentials?.username !== "string" ||
                     typeof credentials?.password !== "string"
                 ) {
-                    console.error("Invalid credentials", credentials)
+                    console.error("Invalid credentials")
                     return null
                 }
                 try {
-                    const body = new FormData()
-                    body.append("username", credentials.username)
-                    body.append("password", credentials.password)
-                    console.log("Sending body", body)
-                    const response = await fetch(process.env.API_URL + `/auth/login`, {
+                    console.log("BACKEND URL:", API_URL)
+                    const body = new URLSearchParams({ "username": credentials.username, "password": credentials.password })
+                    const response = await fetch(API_URL + `/auth/login`, {
                         method: "POST",
                         body: body,
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
                     })
-                    console.log("Received response", response)
-                    console.log("Response body", await response.clone().text())
                     if (!response.ok) {
                         if (response.status === 401) {
                             console.error("Invalid username or password")
@@ -63,9 +59,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                         id: data.user.id.toString(),
                         username: data.user.username,
                         name: data.user.username,
-
                         accessToken: data.access_token,
-                        accessTokenExpires: Date.now() + data.expires_in * 1000,
+                        expires_at: Date.now() + data.expires_in * 1000,
                     }
 
                 } catch (error) {
@@ -84,23 +79,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         async jwt({ token, user }) {
             // `user` is only present when the user initially signs in.
             if (user) {
-                token.id = user.id
+                token.id = user.id!
                 token.username = user.username
                 token.accessToken = user.accessToken
-                token.accessTokenExpires = user.accessTokenExpires
+                token.expires_at = user.expires_at
             }
-
-            return token
+            return token;
         },
 
         async session({ session, token }) {
             if (session.user) {
                 session.user.id = token.id as string
                 session.user.username = token.username as string
-            }
-            if (token) {
-                session.accessToken = token.accessToken as string
-                session.accessTokenExpires = token.accessTokenExpires as number
             }
 
             return session

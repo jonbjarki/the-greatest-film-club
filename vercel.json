@@ -3,7 +3,15 @@
     "services": {
         "frontend": {
             "root": "frontend",
-            "framework": "nextjs"
+            "framework": "nextjs",
+            "bindings": [
+                {
+                    "type": "service",
+                    "service": "backend",
+                    "format": "url",
+                    "env": "BACKEND_INTERNAL_URL"
+                }
+            ]
         },
         "backend": {
             "root": "backend",
@@ -11,7 +19,7 @@
             "entrypoint": "main:app",
             "rewrites": [
                 {
-                    "source": "/backend/:path(.*)?",
+                    "source": "/backend/:path(.*)",
                     "destination": "/:path"
                 }
             ]
@@ -19,16 +27,20 @@
     },
     "rewrites": [
         {
-            "source": "/backend(/.*)?",
+            "source": "/backend/(.*)",
             "destination": {
-                "type": "service",
+                "service": "backend"
+            }
+        },
+        {
+            "source": "/backend",
+            "destination": {
                 "service": "backend"
             }
         },
         {
             "source": "/(.*)",
             "destination": {
-                "type": "service",
                 "service": "frontend"
             }
         }

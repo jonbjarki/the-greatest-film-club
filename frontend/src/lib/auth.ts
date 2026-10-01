@@ -1,20 +1,72 @@
-import { redirect } from "next/navigation";
-import { auth } from "../../auth";
+import { redirect, RedirectType } from "next/navigation";
+import { API_URL, redirectToLogin } from "@/lib/utils";
+import { decode, getToken } from "next-auth/jwt";
+import { cookies } from "next/headers";
 
-export async function authenticatedFetch(input: RequestInfo | URL, init?: RequestInit) {
-    const session = await auth();
-    const token = session?.accessToken;
-    const headers = new Headers(init?.headers || {});
-    if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-    }
-    const response = await fetch(input, { ...init, headers });
 
-    if (!response.ok) {
-        if (response.status === 401) {
-            console.log("Unauthorized, redirecting to sign in");
-            redirect("/api/auth/signin");
+export class NotAuthenticatedError extends Error {
+    constructor() {
+        super();
+        this.name = 'NotAuthenticatedError';
+        Object.setPrototypeOf(this, NotAuthenticatedError.prototype);
+
+        if (Error.captureStackTrace) {
+            Error.captureStackTrace(this, NotAuthenticatedError);
         }
     }
-    return response;
+}
+
+async function getDecodedToken() {
+    // Retrieve the encoded authjs session token from cookies
+    const cookieStore = await cookies();
+
+    const cookieName = process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token";
+    console.log("COOKIE NAME:", cookieName);
+    console.log("NODE ENV:", process.env.NODE_ENV);
+    const sessionCookie = cookieStore.get(cookieName)?.value;
+
+    if (!sessionCookie) return null;
+
+    // Decode the session cookie to extract the JWT token
+    const decodedToken = await decode({
+        token: sessionCookie,
+        secret: process.env.AUTH_SECRET!,
+        salt: cookieName, // Use the cookie name as salt for decoding
+    });
+    console.log("DECODED TOKEN:", decodedToken);
+    console.log("ACCESS TOKEN: ", Boolean(decodedToken?.accessToken));
+
+    if (!decodedToken) {
+        return null;
+    }
+
+    return decodedToken.accessToken;
+}
+
+
+/**
+Utility function for making authenticated requests to the backend API.
+It retrieves the JWT from the encoded session cookie and includes it in the Authorization header of the request. 
+*/
+export async function authenticatedFetch(input: string, init?: RequestInit) {
+    const accessToken = await getDecodedToken();
+    const headers = new Headers(init?.headers || {});
+    if (accessToken) {
+        // If we have a valid access token, include it in the Authorization header
+        headers.set("Authorization", `Bearer ${accessToken}`);
+    }
+
+    console.log("Making authenticated request to: " + input + " with configuration ", init);
+    // Make the authenticated request to the backend API, including the JWT in the Authorization header if available
+    const res = await fetch(API_URL + input, {
+        ...init,
+        headers
+    });
+
+    if (res.status === 401) {
+        // If the response status is 401 (Unauthorized), redirect to the sign-in page
+        redirectToLogin();
+    }
+
+    return res;
 }
