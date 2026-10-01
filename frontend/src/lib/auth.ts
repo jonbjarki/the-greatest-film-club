@@ -21,8 +21,6 @@ async function getDecodedToken() {
     const cookieStore = await cookies();
 
     const cookieName = process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token";
-    console.log("COOKIE NAME:", cookieName);
-    console.log("NODE ENV:", process.env.NODE_ENV);
     const sessionCookie = cookieStore.get(cookieName)?.value;
 
     if (!sessionCookie) return null;
@@ -33,8 +31,6 @@ async function getDecodedToken() {
         secret: process.env.AUTH_SECRET!,
         salt: cookieName, // Use the cookie name as salt for decoding
     });
-    console.log("DECODED TOKEN:", decodedToken);
-    console.log("ACCESS TOKEN: ", Boolean(decodedToken?.accessToken));
 
     if (!decodedToken) {
         return null;
@@ -56,7 +52,6 @@ export async function authenticatedFetch(input: string, init?: RequestInit) {
         headers.set("Authorization", `Bearer ${accessToken}`);
     }
 
-    console.log("Making authenticated request to: " + input + " with configuration ", init);
     // Make the authenticated request to the backend API, including the JWT in the Authorization header if available
     const res = await fetch(API_URL + input, {
         ...init,

@@ -21,7 +21,6 @@ export default function MovieSearchInput({ closeDialog }: { closeDialog: () => v
         const searchFunction = async () => {
             const res = await searchForMovie(deferred);
             setResults(res.results);
-            console.log(res);
         }
         searchFunction();
     }, [deferred])
