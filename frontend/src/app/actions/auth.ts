@@ -40,7 +40,10 @@ export async function signUpAction(_state: SignUpState, formData: FormData): Pro
 
     const res = await fetch(API_URL + `/auth/register`, {
         method: "POST",
-        body: formData
+        body: new URLSearchParams(result.data),
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        }
     });
     console.log(res);
     const resData = await res.json();
