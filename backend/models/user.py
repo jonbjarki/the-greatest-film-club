@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class User(SQLModel, table=True):
-    id: uuid.UUID | None = Field(default=uuid.uuid7(), primary_key=True)
+    id: uuid.UUID | None = Field(default=uuid.uuid7, primary_key=True)
     username: str = Field(index=True, unique=True)
     hashed_password: str
     is_admin: bool = False
