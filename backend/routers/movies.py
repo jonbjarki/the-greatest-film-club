@@ -134,7 +134,6 @@ async def add_movie_from_tmdb(
     session.add(new_movie)
     await session.commit()
     await session.refresh(new_movie)
-    print(f"Created movie with ID: {new_movie.id}")
 
     response.headers["Location"] = f"/movies/{new_movie.id}"
     return {"message": f"Movie {new_movie.id} created"}
