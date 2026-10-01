@@ -1,4 +1,0 @@
-$kind: http-request
-url: "{{base_url}}/auth/refresh"
-method: POST
-order: 3572368032369205
