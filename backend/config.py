@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     TMDB_BASE_URL: str
     SECRET_KEY: str
     API_KEY: str
-    VERCEL_ENV: str
+    VERCEL_ENV: str = "development"
 
     model_config = SettingsConfigDict(
         env_file=".env",
