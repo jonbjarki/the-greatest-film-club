@@ -13,6 +13,9 @@ export default async function Header() {
     return (
         <header className="w-full h-18 overflow-hidden bg-accent">
             <div className="relative mx-auto max-w-3xl lg:max-w-6xl w-full h-full flex items-center justify-center gap-4 ">
+                <Link href="/">
+                    <h1 className="text-2xl font-heading font-bold text-primary">TGFC</h1>
+                </Link>
                 <span className="absolute right-4 ">
                     {session?.user && <Suspense><ProfileDropdown user={session?.user} /></Suspense>}
                     {!session?.user && <SignInButton />}
