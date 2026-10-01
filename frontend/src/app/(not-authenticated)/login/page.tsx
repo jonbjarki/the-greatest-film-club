@@ -3,7 +3,7 @@ import { Field, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { signInAction } from "../actions/auth";
+import { signInAction } from "@/app/actions/auth";
 import { useActionState } from "react";
 
 export default function Page() {

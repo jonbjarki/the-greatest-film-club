@@ -1,10 +1,10 @@
 "use client"
-import type { SignUpState } from "../actions/auth";
+import type { SignUpState } from "@/app/actions/auth";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { signUpAction } from "../actions/auth";
+import { signUpAction } from "@/app/actions/auth";
 import { useActionState } from "react";
 
 const initialState: SignUpState = {
