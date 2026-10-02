@@ -23,7 +23,7 @@ export default function MovieItem({ movie }: { movie: MovieItemType }) {
                         </div>
                         <CardHeader className="p-4">
                             <CardAction>
-                                <Badge className="" variant="default">{movie.vote_count} votes</Badge>
+                                <Badge className="" variant="ghost">{movie.vote_count} votes</Badge>
                             </CardAction>
                             <CardTitle>{movie.name}</CardTitle>
                             <CardDescription>{movie.release_year} · {movie.genres.join(", ")}</CardDescription>
@@ -63,7 +63,7 @@ export default function MovieItem({ movie }: { movie: MovieItemType }) {
                         <div className="w-full flex justify-between items-center">
                             <p className="text-xs w-fit">Added by: {movie.added_by}</p>
                             <div className="flex items-center gap-2 w-fit">
-                                <Badge>{movie.vote_count} votes</Badge>
+                                <Badge variant="ghost">{movie.vote_count} votes</Badge>
                                 <VoteForm movieId={movie.id} userVoted={movie.user_voted} />
                             </div>
                         </div>

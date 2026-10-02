@@ -67,9 +67,27 @@ export const movieSearchResponseSchema = z.object({
     results: z.array(movieSearchItemSchema)
 });
 
+// User
+
+export const userProfileSchema = z.object({
+    id: z.string(),
+    username: z.string(),
+    image_url: z.string().nullable(),
+    bio: z.string().nullable(),
+    created_at: z.coerce.date(),
+});
+
+export const updateUserProfileSchema = z.object({
+    username: z.string().min(4, { error: "Username must be at least 4 characters long" }).optional(),
+    image_url: z.string().nullish(),
+    bio: z.string().nullish(),
+});
+
 export type Credentials = z.infer<typeof credentialsSchema>;
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 export type MovieSearchItemType = z.infer<typeof movieSearchItemSchema>;
 export type MovieSearchResponseType = z.infer<typeof movieSearchResponseSchema>;
 export type MovieItemType = z.infer<typeof movieItemSchema>;
 export type MovieListResponseType = z.infer<typeof movieListResponseSchema>;
+export type UserProfile = z.infer<typeof userProfileSchema>;
+export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;

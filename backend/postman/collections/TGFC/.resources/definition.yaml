@@ -11,4 +11,4 @@ auth:
     type: bearer
     name: Bearer Token
     credentials:
-      token: "{{ACCESS_TOKEN}}"
+      token: "{{vault:ACCESS_TOKEN}}"

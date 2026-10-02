@@ -6,9 +6,9 @@ import ProfileIcon from "../profile/profile-icon";
 import SignInButton from "../auth/sign-in-button";
 import ProfileDropdown from "../profile/profile-dropdown";
 import { Suspense } from "react";
+import { Session } from "next-auth";
 
-export default async function Header() {
-    const session = await auth();
+export default async function Header({ session }: { session: Session }) {
     console.log(session);
     return (
         <header className="w-full h-18 overflow-hidden bg-accent">

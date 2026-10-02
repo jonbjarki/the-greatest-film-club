@@ -16,9 +16,9 @@ from alembic import command
 
 from config import Config
 
-def run_migrations():
+async def run_migrations():
     alembic_cfg = AlembicConfig("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+    await asyncio.to_thread(command.upgrade, alembic_cfg, "head")
 
 async def create_db_and_tables():
     async with engine.begin() as conn:
