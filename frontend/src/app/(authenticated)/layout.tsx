@@ -12,7 +12,7 @@ export default async function AuthenticatedLayout({ children }: LayoutProps<"/">
 
     return (
         <>
-            <Header session={session} />
+            <Header />
             {children}
         </>
 

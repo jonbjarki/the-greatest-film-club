@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { signUpAction } from "@/app/actions/auth";
 import { useActionState } from "react";
+import { useState } from "react";
 
 const initialState: SignUpState = {
     error: null,
@@ -13,6 +14,7 @@ const initialState: SignUpState = {
 }
 
 export default function Page() {
+    const [formData, setFormData] = useState({ username: "", password: "" });
     const [state, formAction, pending] = useActionState(signUpAction, initialState)
     return (
         <main className="h-full w-full flex flex-col items-center justify-center mt-10">
@@ -20,14 +22,14 @@ export default function Page() {
             <form action={formAction} className="w-full max-w-xs flex flex-col gap-4">
                 <Field>
                     <FieldLabel className="text-base" htmlFor="username">Username</FieldLabel>
-                    <Input id="username" name="username" type="text" autoComplete="username" />
+                    <Input id="username" name="username" type="text" autoComplete="username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} />
                     {state.errors?.fieldErrors.username?.map(error =>
                         <FieldError key={error} className="text-xs">{error}</FieldError>
                     )}
                 </Field>
                 <Field>
                     <FieldLabel className="text-base" htmlFor="password">Password</FieldLabel>
-                    <Input id="password" name="password" type="password" />
+                    <Input id="password" name="password" type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
                     {state.errors?.fieldErrors.password?.map(error =>
                         <FieldError key={error} className="text-xs">{error}</FieldError>
                     )}

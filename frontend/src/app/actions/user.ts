@@ -2,9 +2,14 @@
 
 import { authenticatedFetch } from "@/lib/auth"
 import { UpdateUserProfile, UserProfile, userProfileSchema } from "@/lib/schemas";
+import { updateTag } from "next/cache";
 
 export async function getUserByName(username: string): Promise<UserProfile | null> {
-    const res = await authenticatedFetch(`/users/${username}`)
+    const res = await authenticatedFetch(`/users/${username}`, {
+        next: {
+            tags: [`user-${username}`]
+        }
+    })
     if (!res.ok) {
         if (res.status == 404) {
             return null;
@@ -30,6 +35,8 @@ export async function updateProfileAction(data: UpdateUserProfile): Promise<User
         throw new Error(`Failed to update profile: ${res.statusText}`);
     }
 
+    updateTag(`user-${data.username}`);
+    updateTag(`user-me`);
     const user = await userProfileSchema.parseAsync(await res.json());
     return user;
 }

@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, List
 import uuid
-from sqlmodel import ARRAY, Field, ForeignKey, Relationship, SQLModel, String
+from sqlmodel import ARRAY, DateTime, Field, ForeignKey, Relationship, SQLModel, String
 
 from models.user import User
 
@@ -21,5 +21,6 @@ class Movie(SQLModel, table=True):
     poster_url: str | None = None
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="added_movies")
-    added_at: datetime = Field(default_factory=datetime.now)
+    added_at: datetime = Field(default_factory=datetime.now,
+        sa_type=DateTime(timezone=True))
     votes: List["Vote"] = Relationship(back_populates="movie")

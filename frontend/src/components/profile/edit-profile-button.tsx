@@ -10,14 +10,16 @@ import { UserProfile } from "@/lib/schemas"
 import { useState } from "react"
 import { upload } from "@vercel/blob/client"
 import { updateProfileAction } from "@/app/actions/user"
-import { redirect } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function EditProfileButton({ user }: { user: UserProfile }) {
     const [username, setUsername] = useState(user.username);
-    const [bio, setBio] = useState(user.bio ?? "");
+    const [bio, setBio] = useState(user.bio);
     const [image, setImage] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
+    const router = useRouter();
     const handleSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault(); // Prevent the default form submission behavior
         console.log('Submitting profile update with:', { username, bio, image, imageUrl });
@@ -37,6 +39,9 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
             profileImageUrl = blob.url;
             setImageUrl(blob.url);
         }
+        if (username == user.username && bio == user.bio && profileImageUrl == null) {
+            return; // Dont make a request if nothing has changed
+        }
 
         // Update user profile with the new data including the profile image URL
         const res = await updateProfileAction({
@@ -45,7 +50,10 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
             username: username,
         })
 
-        console.log('Profile updated successfully', res);
+        toast.success("Profile updated successfully");
+        if (user.username !== res.username) {
+            router.replace(`/profile/${res.username}`);
+        }
         setOpen(false);
     }
 
@@ -66,14 +74,14 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
                     <FieldGroup>
                         <Field>
                             <Label htmlFor="username">Username</Label>
-                            <Input id="username" name="username" defaultValue={user.username} onChange={(e) => setUsername(e.target.value)} />
+                            <Input id="username" name="username" defaultValue={username} onChange={(e) => setUsername(e.target.value)} />
                         </Field>
                         <Field>
                             <Label htmlFor="bio">Bio</Label>
                             <Textarea
                                 id="bio"
                                 name="bio"
-                                defaultValue={user.bio ?? ""}
+                                defaultValue={bio ?? ""}
                                 placeholder="Say something about yourself"
                                 className="resize-none"
                                 onChange={(e) => setBio(e.target.value)}
@@ -93,7 +101,7 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
                         <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
-                        <button type="submit">Save changes</button>
+                        <Button type="submit">Save changes</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

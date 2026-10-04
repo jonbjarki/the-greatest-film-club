@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{base_url}}/users/me"
+method: PATCH
+body:
+  type: json
+  content: "{\r\n     \r\n}"
+order: 1799207764580848
