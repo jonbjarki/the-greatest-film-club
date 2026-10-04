@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, File, HTTPException
-from sqlmodel import select
+from sqlmodel import func, select
 from typing_extensions import Annotated
 
 from auth import (
@@ -21,8 +21,20 @@ async def update_profile(
     # Extract the provided fields from the update data
     # This will throw a validation error if any of the constraints are violated
     update_dict = data.model_dump(exclude_none=True)
+    
+    # Check if username is taken
+    username = update_dict.get("username")
+    if username is not None:
+        existing_user = await session.execute(
+            select(User).where(func.lower(User.username) == username.lower())
+        )
+        existing_user = existing_user.scalar_one_or_none()
+        if existing_user and existing_user.id != current_user.id:
+            raise HTTPException(status_code=400, detail="Username already taken")
+    
+    # Update the current user using the validated update data
     current_user.sqlmodel_update(update_dict)
-
+    
     session.add(current_user)
     await session.commit()
     await session.refresh(current_user)
@@ -43,7 +55,7 @@ async def get_user_by_username(
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
     user = await session.execute(
-        select(User).where(User.username == username)
+        select(User).where(func.lower(User.username) == username.lower())
     )
     user = user.scalar_one_or_none()
     if user is None:

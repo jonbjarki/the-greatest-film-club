@@ -22,7 +22,13 @@ export async function getUserByName(username: string): Promise<UserProfile | nul
     return user;
 }
 
-export async function updateProfileAction(data: UpdateUserProfile): Promise<UserProfile> {
+type ErrorResponse = {
+    errors: {
+        username?: string;
+    }
+};
+
+export async function updateProfileAction(data: UpdateUserProfile): Promise<UserProfile | ErrorResponse> {
     const res = await authenticatedFetch(`/users/me`, {
         method: "PATCH",
         headers: {
@@ -32,6 +38,16 @@ export async function updateProfileAction(data: UpdateUserProfile): Promise<User
     });
 
     if (!res.ok) {
+        if (res.status == 400) {
+            const errorData = await res.json();
+            if (errorData?.detail === "Username already taken") {
+                return {
+                    errors: {
+                        "username": "Username already taken"
+                    }
+                }
+            }
+        }
         throw new Error(`Failed to update profile: ${res.statusText}`);
     }
 

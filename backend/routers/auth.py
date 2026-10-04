@@ -2,7 +2,7 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import select
+from sqlmodel import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import Annotated
 
@@ -53,7 +53,7 @@ async def register_user(
     session: Annotated[AsyncSession, Depends(get_session)]
 ):
     existing_user = await session.exec(
-        select(User).where(User.username == form_data.username)
+        select(User).where(func.lower(User.username) == form_data.username.lower())
     )
     if existing_user.first():
         raise HTTPException(status_code=400, detail="Username already registered")
