@@ -20,7 +20,7 @@ async def update_profile(
     
     # Extract the provided fields from the update data
     # This will throw a validation error if any of the constraints are violated
-    update_dict = data.model_dump(exclude_none=True)
+    update_dict = data.model_dump(exclude_unset=True)
     
     # Check if username is taken
     username = update_dict.get("username")

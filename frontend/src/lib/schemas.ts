@@ -79,9 +79,9 @@ export const userProfileSchema = z.object({
 });
 
 export const updateUserProfileSchema = z.object({
-    username: z.string().min(4, { error: "Username must be at least 4 characters long" }).optional(),
+    username: z.string().min(4, { error: "Username must be at least 4 characters long" }).nullish(),
     image_url: z.string().nullish(),
-    bio: z.string().min(20, { error: "Bio must be at least 20 characters long" }).max(300, { error: "Bio must be at most 300 characters long" }).nullable(),
+    bio: z.string().min(20, { error: "Bio must be at least 20 characters long" }).max(300, { error: "Bio must be at most 300 characters long" }).nullish(),
 });
 
 export type Credentials = z.infer<typeof credentialsSchema>;

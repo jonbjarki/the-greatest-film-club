@@ -57,28 +57,33 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
 
         // Only upload if the user selected a new image
         if (image) {
-            const blob = await upload(
-                `profile-images/${crypto.randomUUID()}-${image.name}`,
-                image,
-                {
-                    access: "public",
-                    handleUploadUrl: "/api/avatar/upload",
-                },
-            );
-
-            profileImageUrl = blob.url;
-            setImageUrl(blob.url);
+            try {
+                const blob = await upload(
+                    `profile-images/${crypto.randomUUID()}-${image.name}`,
+                    image,
+                    {
+                        access: "public",
+                        handleUploadUrl: "/api/avatar/upload",
+                    },
+                );
+                if (blob) {
+                    profileImageUrl = blob.url;
+                    setImageUrl(blob.url);
+                }
+            } catch (error) {
+                console.error("Failed to upload image:", error);
+                toast.error("Failed to upload image, try again later");
+            }
         }
         if (username == user.username && bio == user.bio && profileImageUrl == null) {
             setPending(false);
             return; // Dont make a request if nothing has changed
         }
-
         // Update user profile with the new data including the profile image URL
         const res = await updateProfileAction({
-            bio: bioLength === 0 ? null : bio,
-            image_url: profileImageUrl,
-            username: username,
+            bio: bio !== user.bio ? bio : undefined,
+            image_url: profileImageUrl !== null ? profileImageUrl : undefined,
+            username: username !== user.username ? username : undefined,
         })
         if ("errors" in res) {
             if (res.errors.username) {
@@ -89,7 +94,7 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
         }
         toast.success("Profile updated successfully");
         if (user.username !== res.username) {
-            router.replace(`/profile/${res.username}`);
+            router.replace(`/profile/${encodeURIComponent(res.username)}`);
         }
         setPending(false);
         setOpen(false);

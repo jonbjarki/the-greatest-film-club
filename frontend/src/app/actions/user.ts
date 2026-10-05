@@ -5,7 +5,7 @@ import { UpdateUserProfile, UserProfile, userProfileSchema } from "@/lib/schemas
 import { updateTag } from "next/cache";
 
 export async function getUserByName(username: string): Promise<UserProfile | null> {
-    const res = await authenticatedFetch(`/users/${username}`, {
+    const res = await authenticatedFetch(`/users/${encodeURIComponent(username)}`, {
         next: {
             tags: [`user-${username}`]
         }
