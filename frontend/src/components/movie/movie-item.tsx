@@ -7,19 +7,26 @@ import VoteForm from "./vote-form";
 import { MovieItemType } from "@/lib/schemas";
 
 export default function MovieItem({ movie }: { movie: MovieItemType }) {
+
     return (
         <li>
             <Dialog>
                 <DialogTrigger asChild>
                     <Card className="cursor-pointer gap-0 py-0 hover:bg-accent/50 transition-colors h-full">
                         <div className="relative aspect-video w-full">
-                            <Image
-                                className="object-cover"
-                                fill
-                                sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                                src={movie.backdrop_url}
-                                alt={"backdrop for " + movie.name}
-                            />
+                            {movie.backdrop_url || movie.poster_url ? (
+                                <Image
+                                    className="object-cover"
+                                    fill
+                                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                                    src={movie.backdrop_url ? movie.backdrop_url : movie.poster_url ?? ""}
+                                    alt={"backdrop for " + movie.name}
+                                />
+                            ) : (
+                                <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                                    <span className="text-muted-foreground">{movie.name}</span>
+                                </div>
+                            )}
                         </div>
                         <CardHeader className="p-4">
                             <CardAction>
@@ -33,13 +40,20 @@ export default function MovieItem({ movie }: { movie: MovieItemType }) {
 
                 <DialogContent className="max-h-[calc(100vh-2rem)] overflow-y-auto">
                     <div className="relative -mx-6 -mt-6 aspect-video w-[calc(100%+3rem)]">
-                        <Image
-                            className="object-cover"
-                            fill
-                            sizes="(min-width: 640px) 28rem, 100vw"
-                            src={movie.backdrop_url}
-                            alt={"backdrop for " + movie.name}
-                        />
+                        {(movie.backdrop_url || movie.poster_url) && (
+                            <Image
+                                className="object-cover"
+                                fill
+                                sizes="(min-width: 640px) 28rem, 100vw"
+                                src={movie.backdrop_url ? movie.backdrop_url : movie.poster_url ?? ""}
+                                alt={"backdrop for " + movie.name}
+                            />
+                        )}
+                        {!movie.backdrop_url && !movie.poster_url && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-muted">
+                                <span className="text-muted-foreground">{movie.name}</span>
+                            </div>
+                        )}
                     </div>
 
                     <DialogHeader>
