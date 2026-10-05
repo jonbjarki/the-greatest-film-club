@@ -34,6 +34,12 @@ export const loginResponseSchema = z.object({
     expires_in: z.number()
 });
 
+export const voteUserSchema = z.object({
+    id: z.string(),
+    username: z.string(),
+    image_url: z.string().nullable()
+});
+
 export const movieItemSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -48,7 +54,8 @@ export const movieItemSchema = z.object({
     added_at: z.coerce.date(),
     added_by: z.string(),
     vote_count: z.number(),
-    user_voted: z.boolean()
+    user_voted: z.boolean(),
+    voted_users: z.array(voteUserSchema),
 });
 
 export const movieListResponseSchema = z.object({

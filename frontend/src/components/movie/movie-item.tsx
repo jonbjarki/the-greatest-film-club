@@ -5,6 +5,9 @@ import Image from "next/image"
 import { Badge } from "../ui/badge";
 import VoteForm from "./vote-form";
 import { MovieItemType } from "@/lib/schemas";
+import ProfileImageWithFallback from "../profile/profile-image-with-fallback";
+import Link from "next/link";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export default function MovieItem({ movie }: { movie: MovieItemType }) {
 
@@ -74,12 +77,34 @@ export default function MovieItem({ movie }: { movie: MovieItemType }) {
                     </div>
 
                     <DialogFooter>
-                        <div className="w-full flex justify-between items-center">
-                            <p className="text-xs w-fit">Added by: {movie.added_by}</p>
-                            <div className="flex items-center gap-2 w-fit">
-                                <Badge variant="ghost">{movie.vote_count} votes</Badge>
-                                <VoteForm movieId={movie.id} userVoted={movie.user_voted} />
+                        <div className="flex flex-col gap-2 w-full">
+                            <div className="w-full flex justify-between items-center">
+                                <p className="text-xs w-fit">Added by: {movie.added_by}</p>
+                                <div className="flex items-center gap-2 w-fit">
+                                    <Badge variant="ghost">{movie.vote_count} votes</Badge>
+                                    <VoteForm movieId={movie.id} userVoted={movie.user_voted} />
+                                </div>
                             </div>
+                            {movie.voted_users.length > 0 && (
+                                <ul className="flex flex-row gap-2 flex-wrap">
+                                    {movie.voted_users.map(user => (
+                                        <li key={user.id} className="w-10 h-10">
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Link href={`/profile/${encodeURIComponent(user.username)}`}>
+                                                        <ProfileImageWithFallback src={user.image_url ?? ""} alt={user.username} username={user.username} size="small" />
+                                                    </Link>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <p>{user.username}</p>
+                                                </TooltipContent>
+
+
+                                            </Tooltip>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </div>
                     </DialogFooter>
                 </DialogContent>
