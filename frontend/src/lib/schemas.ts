@@ -3,6 +3,7 @@ import z from "zod";
 export const passwordSchema = z
     .string()
     .min(6, { error: "Password must be at least 6 characters long." })
+    .max(128, { error: "Password must be at most 128 characters long." })
     // Check for at least one uppercase letter
     .refine((val) => /[A-Z]/.test(val), {
         message: "Password must contain at least one uppercase letter.",
@@ -18,7 +19,7 @@ export const passwordSchema = z
 
 
 export const credentialsSchema = z.object({
-    username: z.string().min(4, { error: "Username must be at least 4 characters long" }),
+    username: z.string().min(4, { error: "Username must be at least 4 characters long" }).max(20, { error: "Username must be at most 20 characters long" }),
     password: passwordSchema
 })
 
@@ -67,9 +68,27 @@ export const movieSearchResponseSchema = z.object({
     results: z.array(movieSearchItemSchema)
 });
 
+// User
+
+export const userProfileSchema = z.object({
+    id: z.string(),
+    username: z.string(),
+    image_url: z.string().nullable(),
+    bio: z.string().nullable(),
+    created_at: z.coerce.date(),
+});
+
+export const updateUserProfileSchema = z.object({
+    username: z.string().min(4, { error: "Username must be at least 4 characters long" }).nullish(),
+    image_url: z.string().nullish(),
+    bio: z.string().min(20, { error: "Bio must be at least 20 characters long" }).max(300, { error: "Bio must be at most 300 characters long" }).nullish(),
+});
+
 export type Credentials = z.infer<typeof credentialsSchema>;
 export type LoginResponse = z.infer<typeof loginResponseSchema>;
 export type MovieSearchItemType = z.infer<typeof movieSearchItemSchema>;
 export type MovieSearchResponseType = z.infer<typeof movieSearchResponseSchema>;
 export type MovieItemType = z.infer<typeof movieItemSchema>;
 export type MovieListResponseType = z.infer<typeof movieListResponseSchema>;
+export type UserProfile = z.infer<typeof userProfileSchema>;
+export type UpdateUserProfile = z.infer<typeof updateUserProfileSchema>;

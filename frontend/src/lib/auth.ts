@@ -1,5 +1,5 @@
 import { redirect, RedirectType } from "next/navigation";
-import { API_URL, redirectToLogin } from "@/lib/utils";
+import { API_URL, redirectToLogin } from "@/lib/common";
 import { decode, getToken } from "next-auth/jwt";
 import { cookies } from "next/headers";
 

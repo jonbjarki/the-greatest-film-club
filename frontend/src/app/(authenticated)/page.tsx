@@ -1,7 +1,7 @@
 import MovieList from "@/components/movie/movie-list";
 import { auth } from "@/../auth";
-import { redirectToLogin } from "@/lib/utils";
 import AddMovieButton from "@/components/add-movie/add-movie-button";
+import { redirectToLogin } from "@/lib/common";
 
 export default async function Home(props: PageProps<"/">) {
   const session = await auth();

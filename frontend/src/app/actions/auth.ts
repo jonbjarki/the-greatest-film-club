@@ -4,7 +4,7 @@ import { signIn } from "@/../auth";
 import z from "zod";
 import { AuthError } from "next-auth";
 import { redirect } from "next/navigation";
-import { API_URL } from "@/lib/utils";
+import { API_URL } from "@/lib/common";
 export type SignUpState = {
     error: string | null,
     message: string,

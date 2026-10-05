@@ -1,7 +1,7 @@
 import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { LoginResponse } from "./src/lib/schemas";
-import { API_URL } from "./src/lib/utils";
+import { API_URL } from "@/lib/common";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
     pages: {

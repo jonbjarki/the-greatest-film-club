@@ -6,8 +6,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 import ProfileIcon from "./profile-icon";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { UserProfile } from "@/lib/schemas";
 
-export default function ProfileDropdown({ user }: { user: User }) {
+export default function ProfileDropdown({ user }: { user: UserProfile }) {
     return (
         <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
@@ -17,8 +18,11 @@ export default function ProfileDropdown({ user }: { user: User }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-20" align="start">
                 <DropdownMenuLabel className="text-xs font-light">
-                    Signed in as {user.name}
+                    Signed in as {user.username}
                 </DropdownMenuLabel>
+                <DropdownMenuItem asChild>
+                    <Link href={`/profile/${user.username}`} className="w-full cursor-pointer">Profile</Link>
+                </DropdownMenuItem>
                 <DropdownMenuItem variant="destructive" asChild>
                     <button onClick={() => signOut()} className="w-full cursor-pointer">Sign out</button>
                 </DropdownMenuItem>

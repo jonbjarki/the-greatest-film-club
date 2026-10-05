@@ -2,11 +2,11 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlmodel import select
+from sqlmodel import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import Annotated
 
-from models.user import User
+from models.user import User, UserRead, UserRegister
 
 from auth import (
     ACCESS_TOKEN_EXPIRE_DAYS,
@@ -47,25 +47,37 @@ async def login(
     }
 
 
-@router.post("/register")
+@router.post("/register", response_model=UserRead)
 async def register_user(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    session: Annotated[AsyncSession, Depends(get_session)],
+    session: Annotated[AsyncSession, Depends(get_session)]
 ):
     existing_user = await session.exec(
-        select(User).where(User.username == form_data.username)
+        select(User).where(func.lower(User.username) == form_data.username.lower())
     )
-
     if existing_user.first():
         raise HTTPException(status_code=400, detail="Username already registered")
-    user = User(
-        username=form_data.username,
-        hashed_password=hash_password(form_data.password),
-    )
-    session.add(user)
-    await session.commit()
-    await session.refresh(user)
-    return {"username": user.username}
+
+    # Validate the user registration data using the UserRegister model
+    try:
+        data = UserRegister(
+            username=form_data.username,
+            password=form_data.password,
+        )
+        user = User(
+            username=data.username,
+            hashed_password=hash_password(data.password.get_secret_value()),
+        )
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+        return user
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=e.errors()
+        )
+    
 
 
 # @router.post("/refresh")

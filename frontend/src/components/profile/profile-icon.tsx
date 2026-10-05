@@ -1,23 +1,17 @@
 import { User } from "next-auth";
 import Image from "next/image";
-import ImageWithFallback from "../common/image-with-fallback";
+import ProfileImageWithFallback from "./profile-image-with-fallback";
+import { UserProfile } from "@/lib/schemas";
 
-function getInitials(name: string | null | undefined) {
-    if (!name) return "";
-    const names = name.split(" ");
-    const initials = names.map(n => n[0].toUpperCase()).join("");
-    return initials.substring(0, 2);
-}
-
-export default function ProfileIcon({ user }: { user: User }) {
-    const userInitials = getInitials(user.name);
+export default function ProfileIcon({ user }: { user: UserProfile }) {
 
     return (
-        <div className="h-12 w-12 cursor-pointer rounded-full overflow-hidden">
-            <ImageWithFallback
-                src={user.image ?? ""}
-                alt={`Profile image for ${user.name}`}
-                fallbackText={userInitials}
+        <div className="h-14 w-14 cursor-pointer rounded-full border p-1">
+            <ProfileImageWithFallback
+                size="small"
+                src={user.image_url ?? ""}
+                alt={`Profile image for ${user.username}`}
+                username={user.username ?? ""}
             />
         </div>
     )

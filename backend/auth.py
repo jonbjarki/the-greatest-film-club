@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from sqlmodel import select
+from sqlmodel import func, select
 from typing_extensions import Annotated
 from sqlmodel.ext.asyncio.session import AsyncSession
 from config import Config
@@ -38,7 +38,7 @@ async def get_user(session: AsyncSession, id: str) -> User | None:
 
 
 async def get_user_by_username(session: AsyncSession, username: str) -> User | None:
-    result = await session.exec(select(User).where(User.username == username))
+    result = await session.exec(select(User).where(func.lower(User.username) == username.lower()))
     return result.first()
 
 
