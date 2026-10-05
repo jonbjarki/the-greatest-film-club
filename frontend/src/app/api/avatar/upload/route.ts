@@ -30,8 +30,6 @@ export async function POST(request: Request): Promise<NextResponse> {
                 // Called by Vercel Blob when the client upload completes
                 // Use tools like ngrok if you want this to work locally
 
-                console.log('blob upload completed', blob, tokenPayload);
-
                 try {
                     // Run any logic after the file upload completed
                     // const { userId } = JSON.parse(tokenPayload);

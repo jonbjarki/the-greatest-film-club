@@ -19,11 +19,10 @@ export default async function ProfilePage(props: PageProps<"/profile/[username]"
     const user = await getUserByName(username) ?? notFound();
     const isOwner = session.user.id === user.id;
 
-    console.log(user);
     return (
         <main className="flex flex-col items-center min-h-screen mt-8 max-w-md mx-auto gap-4 sm:gap-0">
             <section className="flex flex-col lg:flex-row items-center text-center lg:text-left lg:gap-8">
-                <div className="relative w-44 h-44 mb-4 rounded-full border border-foreground">
+                <div className="relative w-44 h-44 mb-4 rounded-full border-2 border-foreground">
                     <ImageWithFallback
                         size="large"
                         src={user.image_url ?? ""}

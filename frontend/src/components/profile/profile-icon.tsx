@@ -6,7 +6,7 @@ import { UserProfile } from "@/lib/schemas";
 export default function ProfileIcon({ user }: { user: UserProfile }) {
 
     return (
-        <div className="h-14 w-14 p-1 cursor-pointer rounded-full border">
+        <div className="h-14 w-14 cursor-pointer rounded-full border p-1">
             <ProfileImageWithFallback
                 size="small"
                 src={user.image_url ?? ""}
