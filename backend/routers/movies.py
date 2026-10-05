@@ -1,15 +1,14 @@
 from fastapi import APIRouter, Depends, Response
 from typing_extensions import Annotated
-from sqlmodel import Session, func, select
+from sqlmodel import func, select
 from sqlalchemy.orm import selectinload
 from sqlmodel.ext.asyncio.session import AsyncSession
 import requests
-import os
 
 from config import Config
 from response_models.movies import MovieListResponse
 from auth import get_current_active_user
-from database import engine, get_session
+from database import get_session
 from models.movie import Movie
 from models.user import User
 from models.vote import Vote
@@ -50,26 +49,18 @@ async def list_movies(
     count_result = await session.exec(select(func.count(Movie.id)))
     count = count_result.first() or 0
 
-    vote_count_subq = (
-        select(Vote.movie_id, func.count(Vote.user_id).label("vote_count"))
-        .group_by(Vote.movie_id)
-        .subquery()
-    )
-
     statement = (
-    select(Movie, func.coalesce(vote_count_subq.c.vote_count, 0))
-    .options(selectinload(Movie.user))
-    .join(
-        vote_count_subq,
-        vote_count_subq.c.movie_id == Movie.id,
-        isouter=True,
+        select(Movie)
+        .options(
+            selectinload(Movie.user),
+            selectinload(Movie.votes).selectinload(Vote.user),
+        )
+        .offset((page - 1) * PAGE_SIZE)
+        .limit(PAGE_SIZE)
     )
-    .offset((page - 1) * PAGE_SIZE)
-    .limit(PAGE_SIZE)
-)
-    movie_rows = (await session.exec(statement)).all()
-    movie_ids = [movie.id for movie, _ in movie_rows]
+    movies = (await session.exec(statement)).all()
 
+    movie_ids = [movie.id for movie in movies]
     voted_rows = await session.exec(
         select(Vote.movie_id).where(
             Vote.user_id == current_user.id, Vote.movie_id.in_(movie_ids)
@@ -80,13 +71,21 @@ async def list_movies(
     return MovieListResponse(
         results=[
             {
-                **movie.model_dump(),
+                **movie.model_dump(exclude={"votes"}),
                 "added_at": movie.added_at.isoformat(),
                 "added_by": movie.user.username,
-                "vote_count": vote_count,
+                "vote_count": len(movie.votes),
                 "user_voted": movie.id in voted_ids,
+                "voted_users": [
+                    {
+                        "id": vote.user.id,
+                        "username": vote.user.username,
+                        "image_url": vote.user.image_url,
+                    }
+                    for vote in movie.votes
+                ],
             }
-            for movie, vote_count in movie_rows
+            for movie in movies
         ],
         page=page,
         total_pages=(count + PAGE_SIZE - 1) // PAGE_SIZE,

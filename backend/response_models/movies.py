@@ -3,6 +3,12 @@ from uuid import UUID
 from sqlmodel import SQLModel
 
 
+class VotedUser(SQLModel):
+    id: UUID
+    username: str
+    image_url: str | None
+
+
 class MovieDetails(SQLModel):
     id: int
     name: str
@@ -18,6 +24,7 @@ class MovieDetails(SQLModel):
     added_by: str | None
     vote_count: int
     user_voted: bool
+    voted_users: list[VotedUser]
 
 
 class MovieListResponse(SQLModel):

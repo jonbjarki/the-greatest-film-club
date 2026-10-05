@@ -1,6 +1,7 @@
 import Header from "@/components/header/header";
 import { auth } from "../../../auth";
 import { redirect } from "next/navigation";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 export default async function AuthenticatedLayout({ children }: LayoutProps<"/">) {
     const session = await auth();
@@ -13,7 +14,9 @@ export default async function AuthenticatedLayout({ children }: LayoutProps<"/">
     return (
         <>
             <Header />
-            {children}
+            <TooltipProvider>
+                {children}
+            </TooltipProvider>
         </>
 
     );
