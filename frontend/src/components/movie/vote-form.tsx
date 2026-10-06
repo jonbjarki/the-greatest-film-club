@@ -1,33 +1,33 @@
 "use client"
 import { voteForMovie, unvoteForMovie } from "@/app/actions/movie";
 import { Button } from "../ui/button";
-import { useActionState, useEffect } from "react";
+import { useTransition } from "react";
 import { toast } from "sonner";
-import { redirect } from "next/navigation";
+import { MovieItemType } from "@/lib/schemas";
 
-const initialState = {
-    message: "",
-    error: false
-}
+export default function VoteForm({ movieId, userVoted, handleClose, onVoted }: { movieId: number, userVoted: boolean, handleClose: () => void, onVoted: (movie: MovieItemType) => Promise<void> }) {
+    const [isPending, startTransition] = useTransition();
 
-export default function VoteForm({ movieId, userVoted }: { movieId: number, userVoted: boolean }) {
-    const voteAction = voteForMovie.bind(null, movieId);
-    const unvoteAction = unvoteForMovie.bind(null, movieId);
-    const [state, formAction, pending] = useActionState(userVoted ? unvoteAction : voteAction, initialState)
-    useEffect(() => {
-        if (state.message !== '') {
-            if (state.error) {
-                toast.error(state.message);
+    const handleVote = async () => {
+        startTransition(async () => {
+            const result = userVoted ? await unvoteForMovie(movieId) : await voteForMovie(movieId);
+
+            if (!result) {
+                toast.error("Failed to vote for movie");
+            } else {
+                toast.success("Vote successful");
+                await onVoted(result);
+                handleClose();
             }
-            else {
-                toast.success(state.message);
-                redirect("/");
-            }
-        }
-    }, [state.message, state.error])
+        });
+    };
+
     return (
-        <form action={formAction}>
-            {userVoted ? <Button type="submit" disabled={pending} variant="destructive">Unvote</Button> : <Button type="submit" disabled={pending}>Vote</Button>}
-        </form>
+        <div>
+            {userVoted ?
+                <Button type="button" disabled={isPending} variant="destructive" onClick={handleVote}>Unvote</Button>
+                :
+                <Button type="button" disabled={isPending} onClick={handleVote}>Vote</Button>}
+        </div>
     )
 }

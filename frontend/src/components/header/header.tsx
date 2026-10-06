@@ -1,12 +1,7 @@
 import Link from "next/link";
-import { Button } from "../ui/button";
-import SignOutButton from "../auth/sign-out-button";
-import { auth } from "@/../auth";
-import ProfileIcon from "../profile/profile-icon";
 import SignInButton from "../auth/sign-in-button";
 import ProfileDropdown from "../profile/profile-dropdown";
 import { Suspense } from "react";
-import { Session } from "next-auth";
 import { authenticatedFetch } from "@/lib/auth";
 import { userProfileSchema } from "@/lib/schemas";
 

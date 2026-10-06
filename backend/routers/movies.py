@@ -6,14 +6,13 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 import requests
 
 from config import Config
-from response_models.movies import MovieListResponse
 from auth import get_current_active_user
 from database import get_session
-from models.movie import Movie
+from models.movie import Movie, MovieDetails, MovieError, MovieListResponse
 from models.user import User
 from models.vote import Vote
 
-PAGE_SIZE = 10
+PAGE_SIZE = 12
 TMDB_BASE_URL = Config.TMDB_BASE_URL
 TMDB_API_KEY = Config.API_KEY
 
@@ -45,6 +44,7 @@ async def list_movies(
     current_user: Annotated[User, Depends(get_current_active_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
     page: int | None = 1,
+    page_size: int | None = PAGE_SIZE,
 ) -> MovieListResponse:
     count_result = await session.exec(select(func.count(Movie.id)))
     count = count_result.first() or 0
@@ -55,8 +55,9 @@ async def list_movies(
             selectinload(Movie.user),
             selectinload(Movie.votes).selectinload(Vote.user),
         )
-        .offset((page - 1) * PAGE_SIZE)
-        .limit(PAGE_SIZE)
+        .order_by(Movie.added_at.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
     )
     movies = (await session.exec(statement)).all()
 
@@ -88,7 +89,7 @@ async def list_movies(
             for movie in movies
         ],
         page=page,
-        total_pages=(count + PAGE_SIZE - 1) // PAGE_SIZE,
+        total_pages=(count + page_size - 1) // page_size,
         total_results=count,
     )
 
@@ -138,20 +139,22 @@ async def add_movie_from_tmdb(
     return {"message": f"Movie {new_movie.id} created"}
 
 
-@router.post("/{id}/vote")
+@router.post("/{id}/vote", response_model=MovieDetails | MovieError)
 async def vote_movie(
     id: int,
     response: Response,
     current_user: Annotated[User, Depends(get_current_active_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
-):
+) -> MovieDetails | MovieError:
     movie = await session.get(Movie, id)
     if not movie:
         response.status_code = 404
         return {"error": "Movie not found"}
+    
     existing_vote = await session.exec(
         select(Vote).where(Vote.user_id == current_user.id, Vote.movie_id == id)
     )
+    
     if existing_vote.first():
         response.status_code = 409
         return {"error": "User has already voted for this movie"}
@@ -159,17 +162,37 @@ async def vote_movie(
     new_vote = Vote(user_id=current_user.id, movie_id=id)
     session.add(new_vote)
     await session.commit()
-    await session.refresh(new_vote)
-    return {"message": f"User {current_user.id} voted for movie {id}"}
+
+    statement = select(Movie).where(Movie.id == id).options(
+        selectinload(Movie.user),
+        selectinload(Movie.votes).selectinload(Vote.user),
+    )
+    movie = (await session.exec(statement)).first()
+
+    return {
+        **movie.model_dump(exclude={"votes"}),
+        "added_at": movie.added_at.isoformat(),
+        "added_by": movie.user.username,
+        "vote_count": len(movie.votes),
+        "user_voted": any(vote.user_id == current_user.id for vote in movie.votes),
+        "voted_users": [
+            {
+                "id": vote.user.id,
+                "username": vote.user.username,
+                "image_url": vote.user.image_url,
+            }
+            for vote in movie.votes
+        ],
+    }
 
 
-@router.post("/{id}/unvote")
+@router.post("/{id}/unvote", response_model=MovieDetails | MovieError)
 async def unvote_movie(
     id: int,
     response: Response,
     session: Annotated[AsyncSession, Depends(get_session)],
     current_user: Annotated[User, Depends(get_current_active_user)],
-):
+) -> MovieDetails | MovieError:
     movie = await session.get(Movie, id)
     if not movie:
         response.status_code = 404
@@ -186,7 +209,28 @@ async def unvote_movie(
 
     await session.delete(existing_vote)
     await session.commit()
-    return {"message": f"User {current_user.id} removed vote for movie {id}"}
+
+    statement = select(Movie).where(Movie.id == id).options(
+        selectinload(Movie.user),
+        selectinload(Movie.votes).selectinload(Vote.user),
+    )
+    movie = (await session.exec(statement)).first()
+
+    return {
+        **movie.model_dump(exclude={"votes"}),
+        "added_at": movie.added_at.isoformat(),
+        "added_by": movie.user.username,
+        "vote_count": len(movie.votes),
+        "user_voted": any(vote.user_id == current_user.id for vote in movie.votes),
+        "voted_users": [
+            {
+                "id": vote.user.id,
+                "username": vote.user.username,
+                "image_url": vote.user.image_url,
+            }
+            for vote in movie.votes
+        ],
+    }
 
 
 @router.get("/tmdb/search")
