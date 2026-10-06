@@ -2,31 +2,27 @@
 
 import { authenticatedFetch } from "@/lib/auth"
 import { updateTag } from "next/cache";
-import { movieSearchResponseSchema } from "@/lib/schemas";
+import { MovieItemType, movieListResponseSchema, movieSearchResponseSchema } from "@/lib/schemas";
 
 export type MovieActionState = {
     message: string,
     error: boolean,
 }
 
-export async function voteForMovie(movieId: number, _initialState: MovieActionState, _formData: FormData): Promise<MovieActionState> {
-    void _initialState;
-    void _formData;
+export async function voteForMovie(movieId: number): Promise<MovieItemType> {
     const res = await authenticatedFetch(`/movies/${movieId}/vote`, {
         method: "POST"
     });
 
     if (!res.ok) {
-        if (res.status === 409) {
-            return { message: "You have already voted for this movie.", error: true };
-        }
         throw new Error(`Failed to vote for movie: ${res.statusText}`);
     }
+
     updateTag("movies");
-    return { message: "Vote submitted", error: false };
+    return await res.json() as MovieItemType;
 }
 
-export async function unvoteForMovie(movieId: number): Promise<MovieActionState> {
+export async function unvoteForMovie(movieId: number): Promise<MovieItemType> {
     const res = await authenticatedFetch(`/movies/${movieId}/unvote`, {
         method: "POST"
     });
@@ -36,7 +32,7 @@ export async function unvoteForMovie(movieId: number): Promise<MovieActionState>
     }
 
     updateTag("movies");
-    return { message: "Vote removed", error: false };
+    return await res.json() as MovieItemType;
 }
 export async function searchForMovie(query: string) {
     const res = await authenticatedFetch(`/movies/tmdb/search?query=${encodeURIComponent(query)}`);
@@ -63,4 +59,23 @@ export async function addMovie(_prevState: MovieActionState, formData: FormData)
     }
     updateTag("movies");
     return { message: "Movie added", error: false };
+}
+
+export async function fetchMoviesAction(page: number) {
+    const url = `/movies?page=${page}`;
+    const res = await authenticatedFetch(url, {
+        next: {
+            tags: ["movies"]
+        }
+    });
+
+    if (!res.ok) {
+        console.error("Failed to fetch movies", await res.text());
+        throw new Error(`Failed to fetch movies: ${res.statusText}`);
+    }
+
+    const unvalidated = await res.json();
+    const data = movieListResponseSchema.parse(unvalidated);
+    return { ...data, hasNext: data.page < data.total_pages }
+
 }

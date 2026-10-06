@@ -8,12 +8,14 @@ import { MovieItemType } from "@/lib/schemas";
 import ProfileImageWithFallback from "../profile/profile-image-with-fallback";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { useState } from "react";
 
-export default function MovieItem({ movie }: { movie: MovieItemType }) {
-
+export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, onVoted: () => Promise<void> }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const handleClose = () => setIsOpen(false);
     return (
         <li>
-            <Dialog>
+            <Dialog open={isOpen} onOpenChange={setIsOpen}>
                 <DialogTrigger asChild>
                     <Card className="cursor-pointer gap-0 py-0 hover:bg-accent/50 transition-colors h-full">
                         <div className="relative aspect-video w-full">
@@ -82,7 +84,7 @@ export default function MovieItem({ movie }: { movie: MovieItemType }) {
                                 <p className="text-xs w-fit">Added by: {movie.added_by}</p>
                                 <div className="flex items-center gap-2 w-fit">
                                     <Badge variant="ghost">{movie.vote_count} votes</Badge>
-                                    <VoteForm movieId={movie.id} userVoted={movie.user_voted} />
+                                    <VoteForm movieId={movie.id} userVoted={movie.user_voted} handleClose={handleClose} onVoted={onVoted} />
                                 </div>
                             </div>
                             {movie.voted_users.length > 0 && (
