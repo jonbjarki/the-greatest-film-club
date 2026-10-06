@@ -10,7 +10,7 @@ import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useState } from "react";
 
-export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, onVoted: () => Promise<void> }) {
+export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, onVoted: (movie: MovieItemType) => Promise<void> }) {
     const [isOpen, setIsOpen] = useState(false);
     const handleClose = () => setIsOpen(false);
     return (
