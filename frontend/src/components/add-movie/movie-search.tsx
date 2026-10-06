@@ -5,6 +5,7 @@ import { addMovie, searchForMovie } from "@/app/actions/movie";
 import { MovieSearchItemType } from "@/lib/schemas";
 import MovieSearchItem from "./movie-search-item";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const initialState = {
     message: "",
@@ -16,6 +17,7 @@ export default function MovieSearchInput({ closeDialog }: { closeDialog: () => v
     const [results, setResults] = useState<MovieSearchItemType[]>([])
     const deferred = useDeferredValue(search);
     const [state, formAction, pending] = useActionState(addMovie, initialState);
+    const router = useRouter();
 
     useEffect(() => {
         const searchFunction = async () => {
@@ -31,7 +33,7 @@ export default function MovieSearchInput({ closeDialog }: { closeDialog: () => v
                 toast.error(state.message);
             } else {
                 toast.success(state.message);
-                closeDialog();
+                window.location.reload();
             }
         }
     }, [state, closeDialog]);

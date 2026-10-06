@@ -55,6 +55,7 @@ async def list_movies(
             selectinload(Movie.user),
             selectinload(Movie.votes).selectinload(Vote.user),
         )
+        .order_by(Movie.added_at.desc())
         .offset((page - 1) * page_size)
         .limit(page_size)
     )

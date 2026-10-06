@@ -3,6 +3,7 @@
 import { authenticatedFetch } from "@/lib/auth"
 import { updateTag } from "next/cache";
 import { MovieItemType, movieListResponseSchema, movieSearchResponseSchema } from "@/lib/schemas";
+import { redirect } from "next/navigation";
 
 export type MovieActionState = {
     message: string,
@@ -57,7 +58,6 @@ export async function addMovie(_prevState: MovieActionState, formData: FormData)
         }
         throw new Error(`Failed to add movie: ${res.statusText}`);
     }
-    updateTag("movies");
     return { message: "Movie added", error: false };
 }
 
