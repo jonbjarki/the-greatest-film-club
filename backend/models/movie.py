@@ -1,7 +1,8 @@
-from datetime import datetime, timezone
-from typing import TYPE_CHECKING, List, ForwardRef
 import uuid
-from sqlmodel import ARRAY, DateTime, Field, ForeignKey, Relationship, SQLModel, String
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING
+
+from sqlmodel import ARRAY, DateTime, Field, Relationship, SQLModel, String
 
 from models.user import User
 
@@ -14,24 +15,28 @@ class Movie(SQLModel, table=True):
     name: str
     description: str
     release_year: int
-    genres: List[str] = Field(default_factory=list, sa_type=ARRAY(String))
-    actor_names: List[str] = Field(default_factory=list, sa_type=ARRAY(String))
-    director_names: List[str] = Field(default_factory=list, sa_type=ARRAY(String))
+    genres: list[str] = Field(default_factory=list, sa_type=ARRAY(String))
+    actor_names: list[str] = Field(default_factory=list, sa_type=ARRAY(String))
+    director_names: list[str] = Field(default_factory=list, sa_type=ARRAY(String))
     backdrop_url: str | None = None
     poster_url: str | None = None
     user_id: uuid.UUID = Field(foreign_key="user.id")
     user: User = Relationship(back_populates="added_movies")
-    added_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc),
-        sa_type=DateTime(timezone=True))
-    votes: List["Vote"] = Relationship(back_populates="movie")
+    added_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC), sa_type=DateTime(timezone=True)
+    )
+    votes: list[Vote] = Relationship(back_populates="movie")
+
 
 class VotedUser(SQLModel):
     id: uuid.UUID
     username: str
     image_url: str | None
 
+
 class MovieError(SQLModel):
     error: str
+
 
 class MovieDetails(SQLModel):
     id: int
@@ -49,7 +54,8 @@ class MovieDetails(SQLModel):
     vote_count: int
     user_voted: bool
     voted_users: list[VotedUser]
-    
+
+
 class MovieListResponse(SQLModel):
     results: list[MovieDetails]
     page: int

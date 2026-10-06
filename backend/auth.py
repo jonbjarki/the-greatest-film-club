@@ -1,22 +1,22 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
+from typing import Annotated
 
+import bcrypt
 from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlmodel import func, select
-from typing_extensions import Annotated
 from sqlmodel.ext.asyncio.session import AsyncSession
+
 from config import Config
 from database import get_session, oauth2_scheme
 from models.user import User
-import bcrypt
 
 SECRET_KEY = Config.SECRET_KEY
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7  # 7 days for access token expiration
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
-
 
 
 def hash_password(password: str) -> str:
@@ -38,7 +38,9 @@ async def get_user(session: AsyncSession, id: str) -> User | None:
 
 
 async def get_user_by_username(session: AsyncSession, username: str) -> User | None:
-    result = await session.exec(select(User).where(func.lower(User.username) == username.lower()))
+    result = await session.exec(
+        select(User).where(func.lower(User.username) == username.lower())
+    )
     return result.first()
 
 
@@ -53,7 +55,7 @@ async def authenticate_user(
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
+    expire = datetime.now(UTC) + timedelta(days=ACCESS_TOKEN_EXPIRE_DAYS)
     to_encode.update({"exp": expire, "type": "access"})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt

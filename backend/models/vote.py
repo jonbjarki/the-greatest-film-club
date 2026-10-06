@@ -1,12 +1,13 @@
-from typing import TYPE_CHECKING
 import uuid
+from typing import TYPE_CHECKING
 
-from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
+from sqlmodel import Field, Relationship, SQLModel
+
 from models.movie import Movie
 
 if TYPE_CHECKING:
-    from models.user import User
     from models.movie import Movie
+    from models.user import User
 
 
 class Vote(SQLModel, table=True):

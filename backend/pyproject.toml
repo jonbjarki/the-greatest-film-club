@@ -18,3 +18,8 @@ dependencies = [
     "sqlmodel>=0.0.42",
     "vercel>=0.11.4",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.10",
+]

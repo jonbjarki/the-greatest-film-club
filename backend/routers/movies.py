@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, Response
-from typing_extensions import Annotated
-from sqlmodel import func, select
-from sqlalchemy.orm import selectinload
-from sqlmodel.ext.asyncio.session import AsyncSession
-import requests
+from typing import Annotated
 
-from config import Config
+import requests
+from fastapi import APIRouter, Depends, Response
+from sqlalchemy.orm import selectinload
+from sqlmodel import func, select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
 from auth import get_current_active_user
+from config import Config
 from database import get_session
 from models.movie import Movie, MovieDetails, MovieError, MovieListResponse
 from models.user import User
@@ -15,6 +16,7 @@ from models.vote import Vote
 PAGE_SIZE = 12
 TMDB_BASE_URL = Config.TMDB_BASE_URL
 TMDB_API_KEY = Config.API_KEY
+
 
 def build_tmdb_image_url(path: str | None) -> str | None:
     return f"https://image.tmdb.org/t/p/w500{path}" if path else None
@@ -150,11 +152,11 @@ async def vote_movie(
     if not movie:
         response.status_code = 404
         return {"error": "Movie not found"}
-    
+
     existing_vote = await session.exec(
         select(Vote).where(Vote.user_id == current_user.id, Vote.movie_id == id)
     )
-    
+
     if existing_vote.first():
         response.status_code = 409
         return {"error": "User has already voted for this movie"}
@@ -163,9 +165,13 @@ async def vote_movie(
     session.add(new_vote)
     await session.commit()
 
-    statement = select(Movie).where(Movie.id == id).options(
-        selectinload(Movie.user),
-        selectinload(Movie.votes).selectinload(Vote.user),
+    statement = (
+        select(Movie)
+        .where(Movie.id == id)
+        .options(
+            selectinload(Movie.user),
+            selectinload(Movie.votes).selectinload(Vote.user),
+        )
     )
     movie = (await session.exec(statement)).first()
 
@@ -210,9 +216,13 @@ async def unvote_movie(
     await session.delete(existing_vote)
     await session.commit()
 
-    statement = select(Movie).where(Movie.id == id).options(
-        selectinload(Movie.user),
-        selectinload(Movie.votes).selectinload(Vote.user),
+    statement = (
+        select(Movie)
+        .where(Movie.id == id)
+        .options(
+            selectinload(Movie.user),
+            selectinload(Movie.votes).selectinload(Vote.user),
+        )
     )
     movie = (await session.exec(statement)).first()
 

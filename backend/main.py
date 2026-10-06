@@ -1,10 +1,8 @@
-
-import asyncio
-
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
-from database import engine, create_db_and_tables, run_migrations
-from routers import movies, users, auth
+
+from database import engine, run_migrations
+from routers import auth, movies, users
 
 
 @asynccontextmanager
