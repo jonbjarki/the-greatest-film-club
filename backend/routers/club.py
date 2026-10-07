@@ -117,3 +117,26 @@ async def join_club(
     await session.commit()
     await session.refresh(link)
     return link
+
+
+@router.delete("/{club_id}/leave")
+async def leave_club(
+    club_id: int,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    club = await session.get(Club, club_id)
+    if not club:
+        raise HTTPException(status_code=404, detail="Club not found")
+
+    link = await session.get(ClubUser, (club_id, current_user.id))
+    if not link or link.status != ClubMemberStatus.ACTIVE:
+        raise HTTPException(status_code=400, detail="You are not a member of this club")
+
+    if link.role == ClubRole.OWNER:
+        raise HTTPException(
+            status_code=400, detail="You can not leave a club while you're the owner"
+        )
+
+    await session.delete(link)
+    await session.commit()
