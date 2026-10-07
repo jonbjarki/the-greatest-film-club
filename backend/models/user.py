@@ -7,13 +7,9 @@ from pydantic import EmailStr, SecretStr, field_validator
 from sqlalchemy import Index, column
 from sqlmodel import DateTime, Field, Relationship, SQLModel, func
 
-from models.club import ClubUser
-
 if TYPE_CHECKING:
-    from models.club import Club
+    from models.club import ClubUser
 
-    from .movie import Movie
-    from .vote import Vote
 
 USERNAME_PATTERN = re.compile(r"^[a-z0-9]+(?:[._-][a-z0-9]+)*$", re.IGNORECASE)
 RESERVED_USERNAMES = {
@@ -48,7 +44,7 @@ def validate_username_format(value: str) -> str:
 class UserBase(SQLModel):
     email: EmailStr
     username: str
-    image_url: str | None = None
+    image_url: str | None = Field(default=None)
     bio: str | None = Field(default=None, min_length=20, max_length=300)
 
 
@@ -59,7 +55,7 @@ class UserRead(UserBase):
 
 class UserUpdate(UserBase):
     username: str | None = Field(default=None, min_length=4, max_length=20)
-    image_url: str | None = None
+    image_url: str | None = Field(default=None)
     email: EmailStr | None = Field(default=None)
 
     @field_validator("username")
@@ -101,8 +97,8 @@ class User(SQLModel, table=True):
     id: uuid.UUID | None = Field(default_factory=uuid.uuid7, primary_key=True)
     username: str = Field(index=True, unique=True)
     email: str = Field(index=True, unique=True)
-    image_url: str | None = None
-    bio: str | None = None
+    image_url: str | None = Field(default=None)
+    bio: str | None = Field(default=None, min_length=20, max_length=300)
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
         sa_column_kwargs={"server_default": func.now()},
@@ -110,6 +106,4 @@ class User(SQLModel, table=True):
     )
     hashed_password: str
     is_admin: bool = False
-    added_movies: list[Movie] = Relationship(back_populates="user")
-    votes: list[Vote] = Relationship(back_populates="user")
-    clubs: list[Club] = Relationship(back_populates="user", link_model=ClubUser)
+    club_links: list[ClubUser] = Relationship(back_populates="user")

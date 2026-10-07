@@ -1,10 +1,12 @@
 import uuid
 from datetime import datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
 from sqlmodel import DateTime, Field, Relationship, SQLModel
 
-from models.user import User
+if TYPE_CHECKING:
+    from models.user import User
 
 
 class ClubRole(str, Enum):
@@ -35,7 +37,7 @@ class ClubRead(ClubBase):
 class ClubUser(SQLModel, table=True):
     club_id: int = Field(foreign_key="club.id", primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id", primary_key=True)
-    role: ClubRole = ClubRole.MEMBER
+    role: ClubRole = Field(default=ClubRole.MEMBER)
 
     status: ClubMemberStatus = ClubMemberStatus.INVITED
     invited_at: datetime | None = Field(
@@ -44,7 +46,10 @@ class ClubUser(SQLModel, table=True):
     )
     joined_at: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))
 
+    club: Club = Relationship(back_populates="member_links")
+    user: User = Relationship(back_populates="club_links")
+
 
 class Club(ClubBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
-    members: list[User] = Relationship(back_populates="club", link_model=ClubUser)
+    member_links: list[ClubUser] = Relationship(back_populates="club")

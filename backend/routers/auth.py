@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import func, select
@@ -50,7 +50,7 @@ async def login(
 
 @router.post("/register", response_model=UserRead)
 async def register_user(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    form_data: Annotated[UserRegister, Form()],
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
     existing_user = await session.exec(
@@ -61,13 +61,12 @@ async def register_user(
 
     # Validate the user registration data using the UserRegister model
     try:
-        data = UserRegister(
-            username=form_data.username,
-            password=form_data.password,
-        )
         user = User(
-            username=data.username,
-            hashed_password=hash_password(data.password.get_secret_value()),
+            username=form_data.username,
+            email=form_data.email,
+            image_url=form_data.image_url,
+            bio=form_data.bio,
+            hashed_password=hash_password(form_data.password.get_secret_value()),
         )
         session.add(user)
         await session.commit()
