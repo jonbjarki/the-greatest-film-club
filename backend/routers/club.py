@@ -38,6 +38,7 @@ async def create_club(
         club=new_club,
         user=current_user,
         invited_at=None,
+        joined_at=datetime.now(UTC),
         status=ClubMemberStatus.ACTIVE,
         role=ClubRole.OWNER,
     )
@@ -48,6 +49,18 @@ async def create_club(
     return new_club
 
 
+@router.get("/{club_id}", response_model=ClubRead)
+async def get_club(
+    club_id: int,
+    session: Annotated[AsyncSession, Depends(get_session)],
+):
+    club = await session.get(Club, club_id)
+    if not club:
+        raise HTTPException(status_code=404, detail="Club not found")
+    members = await session.exec(select(ClubUser).where(ClubUser.club_id == club_id))
+    return {**club.model_dump(), "members": members.all()}
+
+
 @router.post("/{club_id}/invite/{username}")
 async def invite_to_club(
     club_id: int,
@@ -55,7 +68,7 @@ async def invite_to_club(
     current_user: Annotated[User, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
-    club = session.get(Club, club_id)
+    club = await session.get(Club, club_id)
     user = (
         await session.exec(select(User).where(User.username == username))
     ).one_or_none()
@@ -74,7 +87,7 @@ async def invite_to_club(
 
     session.add(link)
     await session.commit()
-    session.refresh(link)
+    await session.refresh(link)
     return link
 
 
@@ -99,6 +112,7 @@ async def join_club(
         raise HTTPException(status_code=409, detail="You have already joined this club")
 
     link.status = ClubMemberStatus.ACTIVE
+    link.joined_at = datetime.now(UTC)
     session.add(link)
     await session.commit()
     await session.refresh(link)
