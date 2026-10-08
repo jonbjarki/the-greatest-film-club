@@ -15,7 +15,9 @@ export default async function AuthenticatedLayout({ children }: LayoutProps<"/">
         <>
             <Header />
             <TooltipProvider>
-                {children}
+                <div className="flex flex-col gap-4 p-4 mx-auto max-w-3xl lg:max-w-6xl">
+                    {children}
+                </div>
             </TooltipProvider>
         </>
 

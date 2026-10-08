@@ -3,7 +3,7 @@ import { voteForMovie, unvoteForMovie } from "@/app/actions/movie";
 import { Button } from "../ui/button";
 import { useTransition } from "react";
 import { toast } from "sonner";
-import { MovieItemType } from "@/lib/schemas";
+import { MovieItemType } from "@/schemas/movie-schemas";
 
 export default function VoteForm({ movieId, userVoted, handleClose, onVoted }: { movieId: number, userVoted: boolean, handleClose: () => void, onVoted: (movie: MovieItemType) => Promise<void> }) {
     const [isPending, startTransition] = useTransition();

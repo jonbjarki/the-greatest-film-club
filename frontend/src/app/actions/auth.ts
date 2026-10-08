@@ -1,5 +1,5 @@
 "use server"
-import { credentialsSchema } from "@/lib/schemas";
+import { credentialsSchema } from "@/schemas/auth-schemas";
 import { signIn } from "@/../auth";
 import z from "zod";
 import { AuthError } from "next-auth";

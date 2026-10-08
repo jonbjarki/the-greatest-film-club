@@ -2,7 +2,7 @@
 import { useActionState, useDeferredValue, useEffect, useState, } from "react";
 import { Input } from "../ui/input";
 import { addMovie, searchForMovie } from "@/app/actions/movie";
-import { MovieSearchItemType } from "@/lib/schemas";
+import { MovieSearchItemType } from "@/schemas/movie-schemas";
 import MovieSearchItem from "./movie-search-item";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";

@@ -12,3 +12,25 @@ auth:
     name: Bearer Token
     credentials:
       token: "{{vault:ACCESS_TOKEN}}"
+  - id: 51739ff1-d142-474a-a41d-a2b52edec471
+    type: oauth2
+    name: OAuth 2.0
+    credentials:
+      - key: addTokenTo
+        value: header
+      - key: id
+        value: collection/A8F1f22CDBa16f3e3EA73a2C/b1397e40-6f0b-4456-b047-d6ba94a4669b/filesystem
+      - key: tokenName
+        value: jwt
+      - key: clientSecret
+        value: 5f1acae31d259208b0e2f59fef52b7ecac8425116ec904488daf44bc7027040e
+      - key: accessTokenUrl
+        value: "{{base_url}}/auth/login"
+      - key: grant_type
+        value: password_credentials
+      - key: username
+        value: nonni
+      - key: password
+        value: Abc.1234
+      - key: id
+        value: collection/A8F1f22CDBa16f3e3EA73a2C/b1397e40-6f0b-4456-b047-d6ba94a4669b/filesystem

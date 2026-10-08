@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuIte
 import ProfileIcon from "./profile-icon";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { UserProfile } from "@/lib/schemas";
+import { UserProfile } from "@/schemas/user-schemas";
 
 export default function ProfileDropdown({ user }: { user: UserProfile }) {
     return (

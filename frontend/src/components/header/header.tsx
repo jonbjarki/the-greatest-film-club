@@ -3,7 +3,7 @@ import SignInButton from "../auth/sign-in-button";
 import ProfileDropdown from "../profile/profile-dropdown";
 import { Suspense } from "react";
 import { authenticatedFetch } from "@/lib/auth";
-import { userProfileSchema } from "@/lib/schemas";
+import { userProfileSchema } from "@/schemas/user-schemas";
 
 async function getMe() {
     const res = await authenticatedFetch("/users/me")

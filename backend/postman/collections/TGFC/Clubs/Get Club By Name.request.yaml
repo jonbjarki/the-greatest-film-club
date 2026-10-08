@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{base_url}}/clubs/name/the-greatest-film-club"
+method: GET
+order: 1791470029084

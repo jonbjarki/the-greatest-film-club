@@ -1,3 +1,4 @@
+import re
 from datetime import UTC, datetime
 from typing import Annotated
 
@@ -7,7 +8,15 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from auth import get_current_user
 from database import get_session
-from models.club import Club, ClubCreate, ClubMemberStatus, ClubRead, ClubRole, ClubUser
+from models.club import (
+    CLUB_NAME_PATH_PATTERN,
+    Club,
+    ClubCreate,
+    ClubMemberStatus,
+    ClubRead,
+    ClubRole,
+    ClubUser,
+)
 from models.user import User
 
 router = APIRouter(tags=["clubs"], prefix="/clubs")
@@ -49,8 +58,8 @@ async def create_club(
     return new_club
 
 
-@router.get("/{club_id}", response_model=ClubRead)
-async def get_club(
+@router.get("/id/{club_id}", response_model=ClubRead)
+async def get_club_by_id(
     club_id: int,
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
@@ -58,6 +67,28 @@ async def get_club(
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
     members = await session.exec(select(ClubUser).where(ClubUser.club_id == club_id))
+    return {**club.model_dump(), "members": members.all()}
+
+
+@router.get("/name/{club_name}", response_model=ClubRead)
+async def get_club_by_name(
+    club_name: str,
+    session: Annotated[AsyncSession, Depends(get_session)],
+):
+    if not re.match(CLUB_NAME_PATH_PATTERN, club_name):
+        raise HTTPException(
+            status_code=400,
+            detail="Name must only contain letters, numbers, and hyphens",
+        )
+
+    print(f"Searching for club with name: {club_name}")
+    statement = await session.exec(
+        select(Club).where(Club.normalized_name == club_name.lower())
+    )
+    club = statement.first()
+    if not club:
+        raise HTTPException(status_code=404, detail="Club not found")
+    members = await session.exec(select(ClubUser).where(ClubUser.club_id == club.id))
     return {**club.model_dump(), "members": members.all()}
 
 

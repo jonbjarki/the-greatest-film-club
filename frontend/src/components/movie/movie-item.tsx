@@ -4,7 +4,7 @@ import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTrigger, Dialo
 import Image from "next/image"
 import { Badge } from "../ui/badge";
 import VoteForm from "./vote-form";
-import { MovieItemType } from "@/lib/schemas";
+import { MovieItemType } from "@/schemas/movie-schemas";
 import ProfileImageWithFallback from "../profile/profile-image-with-fallback";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";

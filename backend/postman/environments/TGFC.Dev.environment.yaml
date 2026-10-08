@@ -10,4 +10,6 @@ values:
     secret: true
   - key: ACCESS_TOKEN
     secret: true
+  - key: jwt_token
+    secret: true
 color: 240

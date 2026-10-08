@@ -1,6 +1,6 @@
 "use client"
 
-import { MovieItemType } from "@/lib/schemas";
+import { MovieItemType } from "@/schemas/movie-schemas";
 import MovieItem from "./movie-item";
 import { useEffect, useRef, useState } from "react";
 import { fetchMoviesAction } from "@/app/actions/movie";

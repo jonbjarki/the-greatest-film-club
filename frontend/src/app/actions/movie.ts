@@ -2,8 +2,7 @@
 
 import { authenticatedFetch } from "@/lib/auth"
 import { updateTag } from "next/cache";
-import { MovieItemType, movieListResponseSchema, movieSearchResponseSchema } from "@/lib/schemas";
-import { redirect } from "next/navigation";
+import { MovieItemType, movieListResponseSchema, movieSearchResponseSchema } from "@/schemas/movie-schemas";
 
 export type MovieActionState = {
     message: string,
