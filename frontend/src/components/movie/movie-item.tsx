@@ -1,18 +1,13 @@
-"use client"
-import { Card, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
-import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+﻿"use client"
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { DialogContent, DialogHeader, Dialog, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import Image from "next/image"
-import { Badge } from "../ui/badge";
-import VoteForm from "./vote-form";
 import { MovieItemType } from "@/schemas/movie-schemas";
-import ProfileImageWithFallback from "../profile/profile-image-with-fallback";
-import Link from "next/link";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useState } from "react";
 
-export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, onVoted: (movie: MovieItemType) => Promise<void> }) {
+export default function MovieItem({ movie }: { movie: MovieItemType }) {
     const [isOpen, setIsOpen] = useState(false);
-    const handleClose = () => setIsOpen(false);
+
     return (
         <li>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -34,11 +29,8 @@ export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, on
                             )}
                         </div>
                         <CardHeader className="p-4">
-                            <CardAction>
-                                <Badge className="" variant="ghost">{movie.vote_count} votes</Badge>
-                            </CardAction>
                             <CardTitle>{movie.name}</CardTitle>
-                            <CardDescription>{movie.release_year} · {movie.genres.join(", ")}</CardDescription>
+                            <CardDescription>{movie.release_year} &middot; {movie.genres.join(", ")}</CardDescription>
                         </CardHeader>
                     </Card>
                 </DialogTrigger>
@@ -77,40 +69,9 @@ export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, on
                             <span className="font-medium text-foreground">Starring:</span> {movie.actor_names.join(", ")}
                         </p>
                     </div>
-
-                    <DialogFooter>
-                        <div className="flex flex-col gap-2 w-full">
-                            <div className="w-full flex justify-between items-center">
-                                <p className="text-xs w-fit">Added by: {movie.added_by}</p>
-                                <div className="flex items-center gap-2 w-fit">
-                                    <Badge variant="ghost">{movie.vote_count} votes</Badge>
-                                    <VoteForm movieId={movie.id} userVoted={movie.user_voted} handleClose={handleClose} onVoted={onVoted} />
-                                </div>
-                            </div>
-                            {movie.voted_users.length > 0 && (
-                                <ul className="flex flex-row gap-2 flex-wrap">
-                                    {movie.voted_users.map(user => (
-                                        <li key={user.id} className="w-10 h-10">
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Link href={`/profile/${encodeURIComponent(user.username)}`}>
-                                                        <ProfileImageWithFallback src={user.image_url ?? ""} alt={user.username} username={user.username} size="small" />
-                                                    </Link>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{user.username}</p>
-                                                </TooltipContent>
-
-
-                                            </Tooltip>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </li >
     )
 }
+

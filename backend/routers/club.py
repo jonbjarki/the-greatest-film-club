@@ -62,6 +62,7 @@ async def create_club(
 async def get_club_by_id(
     club_id: int,
     session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ):
     club = await session.get(Club, club_id)
     if not club:
@@ -74,6 +75,7 @@ async def get_club_by_id(
 async def get_club_by_name(
     club_name: str,
     session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ):
     if not re.match(CLUB_NAME_PATH_PATTERN, club_name):
         raise HTTPException(
@@ -88,8 +90,8 @@ async def get_club_by_name(
     club = statement.first()
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
-    members = await session.exec(select(ClubUser).where(ClubUser.club_id == club.id))
-    return {**club.model_dump(), "members": members.all()}
+    member = await session.get(ClubUser, (club.id, current_user.id))
+    return {**club.model_dump(), "member": member}
 
 
 @router.post("/{club_id}/invite/{username}")

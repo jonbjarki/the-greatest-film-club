@@ -1,7 +1,8 @@
 "use client"
 import { useActionState, useDeferredValue, useEffect, useState, } from "react";
 import { Input } from "../ui/input";
-import { addMovie, searchForMovie } from "@/app/actions/movie";
+import { searchForMovie } from "@/app/actions/movie";
+import { addMovieToMovieNightAction } from "@/app/actions/movie-night";
 import { MovieSearchItemType } from "@/schemas/movie-schemas";
 import MovieSearchItem from "./movie-search-item";
 import { toast } from "sonner";
@@ -12,11 +13,11 @@ const initialState = {
     error: false,
 };
 
-export default function MovieSearchInput({ closeDialog }: { closeDialog: () => void }) {
+export default function MovieSearchInput({ movieNightId, closeDialog }: { movieNightId: number, closeDialog: () => void }) {
     const [search, setSearch] = useState("");
     const [results, setResults] = useState<MovieSearchItemType[]>([])
     const deferred = useDeferredValue(search);
-    const [state, formAction, pending] = useActionState(addMovie, initialState);
+    const [state, formAction, pending] = useActionState(addMovieToMovieNightAction, initialState);
     const router = useRouter();
 
     useEffect(() => {
@@ -33,16 +34,18 @@ export default function MovieSearchInput({ closeDialog }: { closeDialog: () => v
                 toast.error(state.message);
             } else {
                 toast.success(state.message);
-                window.location.reload();
+                closeDialog();
+                router.refresh();
             }
         }
-    }, [state, closeDialog]);
+    }, [state, closeDialog, router]);
 
 
     return (
         <div>
             <Input type="search" className="bg-white rounded-sm p-4" placeholder="Search for a movie.." value={search} onChange={(e) => setSearch(e.target.value)} />
             <form action={formAction}>
+                <input type="hidden" name="movieNightId" value={movieNightId} />
                 <ul>
                     {results.map(
                         movie => <MovieSearchItem key={movie.id} movie={movie} pending={pending} />

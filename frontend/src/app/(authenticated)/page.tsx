@@ -1,7 +1,5 @@
 import { auth } from "@/../auth";
-import AddMovieButton from "@/components/add-movie/add-movie-button";
 import { redirectToLogin } from "@/lib/common";
-import MovieListContainer from "@/components/movie/movie-list-container";
 
 export default async function Home() {
   const session = await auth();
@@ -17,3 +15,4 @@ export default async function Home() {
     </div>
   );
 }
+

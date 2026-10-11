@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import UniqueConstraint
+from sqlalchemy.orm import validates
 from sqlmodel import DateTime, Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
@@ -19,6 +20,11 @@ class MovieNightBase(SQLModel):
 
 class MovieNightCreate(MovieNightBase):
     pass
+
+
+class MovieNightRead(MovieNightBase):
+    id: int
+    normalized_title: str
 
 
 class MovieNightMovieRead(SQLModel):
@@ -77,3 +83,11 @@ class MovieNight(MovieNightBase, table=True):
     __tablename__ = "movie_night"
     id: int | None = Field(primary_key=True, default=None)
     movie_entries: list[MovieNightMovie] = Relationship(back_populates="movie_night")
+    normalized_title: str
+
+    @validates("title")
+    def normalize_and_set_title(self, key: str, value: str) -> str:
+        """Automatically normalizes the movie night's title whenever it is set."""
+        if value:
+            self.normalized_title = value.replace(" ", "-").lower()
+        return value

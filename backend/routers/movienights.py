@@ -1,18 +1,24 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from auth import get_current_user
-from dal.movies import create_movie_from_tmdb_id
+from dal.movies import create_movie_from_tmdb_id, search_tmdb
 from database import get_session
 from models.club import Club, ClubMemberStatus, ClubRole, ClubUser
 from models.movie import Movie
-from models.movie_night import MovieNight, MovieNightCreate, MovieNightMovie
+from models.movie_night import (
+    MovieNight,
+    MovieNightCreate,
+    MovieNightMovie,
+    MovieNightRead,
+)
 from models.user import User
 
-router = APIRouter(tags=["Movie Night"], prefix="/movienights")
+router = APIRouter(tags=["Movie Night"], prefix="/movie-nights")
 
 
 @router.post("/")
@@ -51,6 +57,32 @@ async def create_movie_night(
     return new_movie_night
 
 
+@router.get("/search")
+async def search_movies(
+    query: str,
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    if not query.strip():
+        return {"results": []}
+    return await search_tmdb(query)
+
+
+@router.get("/club/{club_id}")
+async def get_movie_nights_for_club(
+    club_id: int,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> list[MovieNightRead]:
+    club = await session.get(Club, club_id)
+    if not club:
+        raise HTTPException(status_code=404, detail="Club not found")
+    result = await session.execute(
+        select(MovieNight).where(MovieNight.club_id == club_id)
+    )
+    movie_nights = result.scalars().all()
+    return movie_nights
+
+
 @router.post("/{movie_night_id}/movies")
 async def add_movie_to_movie_night(
     movie_night_id: int,
@@ -59,7 +91,11 @@ async def add_movie_to_movie_night(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
     movie_night = await session.get(
-        MovieNight, movie_night_id, options=[selectinload(MovieNight.movie_entries)]
+        MovieNight,
+        movie_night_id,
+        options=[
+            selectinload(MovieNight.movie_entries).selectinload(MovieNightMovie.movie)
+        ],
     )
     if not movie_night:
         raise HTTPException(status_code=404, detail="Movie night not found")
@@ -108,11 +144,16 @@ async def add_movie_to_movie_night(
 async def get_movies_for_movie_night(
     movie_night_id: int,
     session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ):
     movie_night = await session.get(
-        MovieNight, movie_night_id, options=[selectinload(MovieNight.movie_entries)]
+        MovieNight,
+        movie_night_id,
+        options=[
+            selectinload(MovieNight.movie_entries).selectinload(MovieNightMovie.movie),
+        ],
     )
     if not movie_night:
         raise HTTPException(status_code=404, detail="Movie night not found")
-    movies = movie_night.movie_entries
+    movies = [entry.movie for entry in movie_night.movie_entries]
     return movies

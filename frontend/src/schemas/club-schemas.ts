@@ -9,6 +9,10 @@ export const clubMetadataSchema = z.object({
     name: z.string(),
     normalized_name: z.string(),
     description: z.string().nullable(),
+    member: z.object({
+        role: z.enum(["member", "admin", "owner"]),
+        status: z.enum(["active", "invited"]),
+    }).optional(),
 });
 
 export const createClubSchema = z.object({
@@ -18,3 +22,18 @@ export const createClubSchema = z.object({
         .refine((value) => /^[a-zA-Z0-9 ]+$/.test(value), { error: "Name can only contain alphanumeric characters and spaces." }),
     description: z.string().max(DESCRIPTION_MAX_LENGTH, { error: `Description must be at most ${DESCRIPTION_MAX_LENGTH} characters.` }).nullable(),
 })
+
+export const clubRoleSchema = z.enum(["member", "admin", "owner"]);
+export const clubMemberStatus = z.enum(["active", "invited"]);
+
+export const clubUserSchema = z.object({
+    club_id: z.number(),
+    user_id: z.number(),
+    role: clubRoleSchema,
+    status: clubMemberStatus,
+    invited_at: z.date().nullable(),
+    joined_at: z.date().nullable()
+});
+
+
+export type ClubMetadata = z.infer<typeof clubMetadataSchema>;

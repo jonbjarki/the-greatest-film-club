@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import MovieSearchInput from "./movie-search";
 
-export default function AddMovieButton() {
+export default function AddMovieButton({ movieNightId }: { movieNightId: number }) {
     const [open, setOpen] = useState(false);
     const handleOpenChange = (open: boolean) => setOpen(open);
     const closeDialog = useCallback(() => setOpen(false), []);
@@ -18,7 +18,7 @@ export default function AddMovieButton() {
 
             <DialogContent showCloseButton={false} className="top-[10%] translate-y-0 sm:max-w-md bg-none! shadow-none! ring-0 drop-shadow-none!  outline-none! border-none! bg-transparent max-h-[calc(100vh-2rem)] overflow-y-auto">
 
-                <MovieSearchInput closeDialog={closeDialog} />
+                <MovieSearchInput movieNightId={movieNightId} closeDialog={closeDialog} />
             </DialogContent>
         </Dialog>
     )

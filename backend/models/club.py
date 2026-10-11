@@ -53,6 +53,7 @@ class ClubCreate(ClubBase):
 class ClubRead(ClubBase):
     id: int
     normalized_name: str
+    member: ClubUser
 
 
 class ClubReadWithMembers(ClubRead):
@@ -79,7 +80,7 @@ class Club(ClubBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     member_links: list[ClubUser] = Relationship(back_populates="club")
     # Normalized version of the name for route paths
-    normalized_name: str = Field(index=True)
+    normalized_name: str = Field(index=True, unique=True)
 
     @validates("name")
     def normalize_and_set_name(self, key: str, value: str) -> str:
