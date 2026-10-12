@@ -1,5 +1,3 @@
-import ClubHeader from "@/components/club/club-header";
-
 export default async function ClubViewLayout({ children }: { children: React.ReactNode }) {
     return (
         <div>

@@ -51,7 +51,7 @@ export async function createMovieNightAction(_prevState: CreateMovieNightActionS
 
 
 export async function getMovieNightsAction(clubId: number) {
-    const res = await authenticatedFetch(`/movie-nights/club/${clubId}`);
+    const res = await authenticatedFetch(`/movie-nights/clubs/${clubId}`);
     if (!res.ok) {
         if (res.status == 404) return [];
         console.error(await res.text());

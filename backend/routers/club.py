@@ -71,7 +71,7 @@ async def get_club_by_id(
     return {**club.model_dump(), "members": members.all()}
 
 
-@router.get("/name/{club_name}", response_model=ClubRead)
+@router.get("/name/{club_name}")
 async def get_club_by_name(
     club_name: str,
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -91,7 +91,29 @@ async def get_club_by_name(
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
     member = await session.get(ClubUser, (club.id, current_user.id))
+    if not member:
+        raise HTTPException(status_code=404, detail="You are not a member of this club")
     return {**club.model_dump(), "member": member}
+
+
+@router.get("/user/", response_model=list[ClubRead])
+async def get_clubs_for_user(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    result = await session.exec(
+        select(Club, ClubUser)
+        .join(ClubUser, Club.id == ClubUser.club_id)
+        .where(ClubUser.user_id == current_user.id)
+    )
+    rows = result.all()
+    return [
+        ClubRead(
+            **club.model_dump(),
+            member=member,
+        )
+        for club, member in rows
+    ]
 
 
 @router.post("/{club_id}/invite/{username}")
