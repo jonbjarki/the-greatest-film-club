@@ -46,6 +46,13 @@ class ClubBase(SQLModel):
         return value
 
 
+class ClubInvite(SQLModel):
+    club_id: int
+    name: str
+    invited_at: datetime
+    user_id: uuid.UUID
+
+
 class ClubCreate(ClubBase):
     pass
 

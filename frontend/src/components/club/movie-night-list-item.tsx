@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function MovieNightListItem({ movieNight, normalized_club_name }: { movieNight: MovieNight, normalized_club_name: string }) {
     return (
-        <Link href={`/club/view/${encodeURIComponent(normalized_club_name)}/movie-nights/${encodeURIComponent(movieNight.normalized_title)}`}>
+        <Link href={`/clubs/view/${encodeURIComponent(normalized_club_name)}/movie-nights/${encodeURIComponent(movieNight.normalized_title)}`}>
             <Card className="hover:shadow-xs transition-shadow h-full hover:border">
                 <CardHeader>
                     {movieNight.title}

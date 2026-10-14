@@ -5,13 +5,14 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-
+from sqlalchemy.orm import selectinload
 from auth import get_current_user
 from database import get_session
 from models.club import (
     CLUB_NAME_PATH_PATTERN,
     Club,
     ClubCreate,
+    ClubInvite,
     ClubMemberStatus,
     ClubRead,
     ClubRole,
@@ -55,7 +56,7 @@ async def create_club(
     await session.commit()
     await session.refresh(link)
 
-    return new_club
+    return ClubRead(**new_club.model_dump(), member=link)
 
 
 @router.get("/id/{club_id}", response_model=ClubRead)
@@ -104,7 +105,10 @@ async def get_clubs_for_user(
     result = await session.exec(
         select(Club, ClubUser)
         .join(ClubUser, Club.id == ClubUser.club_id)
-        .where(ClubUser.user_id == current_user.id)
+        .where(
+            ClubUser.user_id == current_user.id,
+            ClubUser.status == ClubMemberStatus.ACTIVE,
+        )
     )
     rows = result.all()
     return [
@@ -171,7 +175,34 @@ async def join_club(
     session.add(link)
     await session.commit()
     await session.refresh(link)
-    return link
+    await session.refresh(club)
+    return ClubRead(**club.model_dump(), member=link)
+
+
+@router.get("/invites")
+async def get_active_invites(
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    result = await session.exec(
+        select(ClubUser)
+        .where(
+            ClubUser.user_id == current_user.id,
+            ClubUser.status == ClubMemberStatus.INVITED,
+        )
+        .options(selectinload(ClubUser.club))
+    )
+    invites = result.all()
+
+    return [
+        ClubInvite(
+            club_id=invite.club_id,
+            name=invite.club.name,
+            invited_at=invite.invited_at,
+            user_id=invite.user_id,
+        )
+        for invite in invites
+    ]
 
 
 @router.delete("/{club_id}/leave")

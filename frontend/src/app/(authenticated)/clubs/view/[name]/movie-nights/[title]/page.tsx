@@ -11,7 +11,7 @@ async function MovieNightMovies({ movieNightId }: { movieNightId: number }) {
     return <MovieList movies={movies} />;
 }
 
-export default async function MovieNightPage(props: PageProps<"/club/view/[name]/movie-nights/[title]">) {
+export default async function MovieNightPage(props: PageProps<"/clubs/view/[name]/movie-nights/[title]">) {
     const params = await props.params;
     const club = await getClubByNameAction(decodeURIComponent(params.name));
     if (!club) {
@@ -25,7 +25,7 @@ export default async function MovieNightPage(props: PageProps<"/club/view/[name]
 
     return (
         <main className="flex flex-col gap-4 p-4 mx-auto max-w-3xl lg:max-w-6xl">
-            <Link href={`/club/view/${encodeURIComponent(club.normalized_name)}`} className="text-sm underline">&larr; {club.name}</Link>
+            <Link href={`/clubs/view/${encodeURIComponent(club.normalized_name)}`} className="text-sm underline">&larr; {club.name}</Link>
             <div className="flex items-start justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-medium">{movieNight.title}</h1>

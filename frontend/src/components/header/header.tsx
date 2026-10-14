@@ -4,6 +4,7 @@ import ProfileDropdown from "../profile/profile-dropdown";
 import { Suspense } from "react";
 import { authenticatedFetch } from "@/lib/auth";
 import { userProfileSchema } from "@/schemas/user-schemas";
+import Navbar from "./navbar";
 
 async function getMe() {
     const res = await authenticatedFetch("/users/me", {
@@ -24,10 +25,7 @@ export default async function Header() {
                 <Link href="/" className="left-4 absolute">
                     <h1 className="text-2xl font-heading font-bold text-primary">TGFC</h1>
                 </Link>
-                <nav>
-                    <Link href="/club" className="hover:underline underline-offset-2">Clubs</Link>
-
-                </nav>
+                <Navbar />
                 <span className="absolute right-4 ">
                     {user && <Suspense><ProfileDropdown user={user} /></Suspense>}
                     {!user && <SignInButton />}

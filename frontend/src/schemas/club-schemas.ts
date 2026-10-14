@@ -12,8 +12,22 @@ export const clubMetadataSchema = z.object({
     member: z.object({
         role: z.enum(["member", "admin", "owner"]),
         status: z.enum(["active", "invited"]),
+        invited_at: z.coerce.date().nullable(),
+        joined_at: z.coerce.date().nullable(),
+        club_id: z.number(),
+        user_id: z.string(),
     }).optional(),
 });
+
+export const clubMetadataArraySchema = z.array(clubMetadataSchema);
+
+export const clubInviteSchema = z.object({
+    club_id: z.number(),
+    user_id: z.string(),
+    invited_at: z.coerce.date(),
+    name: z.string(),
+});
+export const clubInviteArraySchema = z.array(clubInviteSchema);
 
 export const createClubSchema = z.object({
     name: z.string()
@@ -31,9 +45,12 @@ export const clubUserSchema = z.object({
     user_id: z.number(),
     role: clubRoleSchema,
     status: clubMemberStatus,
-    invited_at: z.date().nullable(),
-    joined_at: z.date().nullable()
+    invited_at: z.coerce.date().nullable(),
+    joined_at: z.coerce.date().nullable()
 });
 
 
 export type ClubMetadata = z.infer<typeof clubMetadataSchema>;
+export type ClubMetadataArray = z.infer<typeof clubMetadataArraySchema>;
+
+export type ClubInvite = z.infer<typeof clubInviteSchema>;
