@@ -3,9 +3,10 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
-from sqlalchemy.orm import selectinload
+
 from auth import get_current_user
 from database import get_session
 from models.club import (
@@ -17,6 +18,7 @@ from models.club import (
     ClubRead,
     ClubRole,
     ClubUser,
+    ClubUserRead,
 )
 from models.user import User
 
@@ -68,8 +70,8 @@ async def get_club_by_id(
     club = await session.get(Club, club_id)
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
-    members = await session.exec(select(ClubUser).where(ClubUser.club_id == club_id))
-    return {**club.model_dump(), "members": members.all()}
+    member = await session.exec(select(ClubUser).where(ClubUser.club_id == club_id))
+    return {**club.model_dump(), "member": member.first()}
 
 
 @router.get("/name/{club_name}")
@@ -95,6 +97,37 @@ async def get_club_by_name(
     if not member:
         raise HTTPException(status_code=404, detail="You are not a member of this club")
     return {**club.model_dump(), "member": member}
+
+
+@router.get("/club/{club_id}/members")
+async def get_club_members(
+    club_id: int,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    club = await session.get(Club, club_id)
+    if not club:
+        raise HTTPException(status_code=404, detail="Club not found")
+
+    member = await session.get(ClubUser, (club_id, current_user.id))
+    if not member:
+        raise HTTPException(status_code=404, detail="You are not a member of this club")
+    members = await session.exec(
+        select(ClubUser, User)
+        .where(ClubUser.club_id == club_id)
+        .where(ClubUser.user_id == User.id)
+    )
+    return [
+        ClubUserRead(
+            club_id=club_user.club_id,
+            role=club_user.role,
+            status=club_user.status,
+            invited_at=club_user.invited_at,
+            joined_at=club_user.joined_at,
+            user=user,
+        )
+        for club_user, user in members.all()
+    ]
 
 
 @router.get("/user/", response_model=list[ClubRead])

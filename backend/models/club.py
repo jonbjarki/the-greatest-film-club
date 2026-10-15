@@ -8,6 +8,8 @@ from pydantic import field_validator
 from sqlalchemy.orm import validates
 from sqlmodel import DateTime, Field, Relationship, SQLModel
 
+from models.user import UserRead
+
 if TYPE_CHECKING:
     from models.user import User
 
@@ -63,10 +65,6 @@ class ClubRead(ClubBase):
     member: ClubUser
 
 
-class ClubReadWithMembers(ClubRead):
-    members: list[ClubUser] = []
-
-
 class ClubUser(SQLModel, table=True):
     club_id: int = Field(foreign_key="club.id", primary_key=True)
     user_id: uuid.UUID = Field(foreign_key="user.id", primary_key=True)
@@ -81,6 +79,15 @@ class ClubUser(SQLModel, table=True):
 
     club: Club = Relationship(back_populates="member_links")
     user: User = Relationship(back_populates="club_links")
+
+
+class ClubUserRead(SQLModel):
+    club_id: int
+    role: ClubRole
+    status: ClubMemberStatus
+    invited_at: datetime | None = None
+    joined_at: datetime | None = None
+    user: UserRead
 
 
 class Club(ClubBase, table=True):
