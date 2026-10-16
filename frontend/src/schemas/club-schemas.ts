@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { userProfileSchema } from "./user-schemas";
 
 export const DESCRIPTION_MAX_LENGTH = 255
 export const NAME_MAX_LENGTH = 50
@@ -37,8 +38,27 @@ export const createClubSchema = z.object({
     description: z.string().max(DESCRIPTION_MAX_LENGTH, { error: `Description must be at most ${DESCRIPTION_MAX_LENGTH} characters.` }).nullable(),
 })
 
+export const USERNAME_MAX_LENGTH = 20
+
+export const inviteUserSchema = z.object({
+    username: z.string()
+        .trim()
+        .min(1, { error: "Enter a username." })
+        .max(USERNAME_MAX_LENGTH, { error: `Usernames are at most ${USERNAME_MAX_LENGTH} characters.` }),
+});
+
 export const clubRoleSchema = z.enum(["member", "admin", "owner"]);
 export const clubMemberStatus = z.enum(["active", "invited"]);
+
+export const clubMemberSchema = z.object({
+    club_id: z.number(),
+    role: clubRoleSchema,
+    status: clubMemberStatus,
+    invited_at: z.coerce.date().nullable(),
+    joined_at: z.coerce.date().nullable(),
+    user: userProfileSchema,
+});
+export const clubMemberArraySchema = z.array(clubMemberSchema);
 
 export const clubUserSchema = z.object({
     club_id: z.number(),
@@ -54,3 +74,6 @@ export type ClubMetadata = z.infer<typeof clubMetadataSchema>;
 export type ClubMetadataArray = z.infer<typeof clubMetadataArraySchema>;
 
 export type ClubInvite = z.infer<typeof clubInviteSchema>;
+
+export type ClubRole = z.infer<typeof clubRoleSchema>;
+export type ClubMember = z.infer<typeof clubMemberSchema>;

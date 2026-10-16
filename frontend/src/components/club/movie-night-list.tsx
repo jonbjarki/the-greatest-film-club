@@ -1,20 +1,17 @@
 import { getMovieNightsAction } from "@/app/actions/movie-night";
 import { ClubMetadata } from "@/schemas/club-schemas";
 import MovieNightListItem from "./movie-night-list-item";
-import { Button } from "../ui/button";
+import CreateMovieNightButton from "./create-movie-night-button";
+import { canManageClub } from "@/lib/club-permissions";
 
 export default async function MovieNightList({ club }: { club: ClubMetadata }) {
     const movieNights = await getMovieNightsAction(club.id);
-    const canCreate = club.member?.role === "admin" || club.member?.role === "owner";
+    const canCreate = canManageClub(club);
     return (
         <>
             <div className="flex flex-row gap-4 items-center mb-4">
                 <h2 className="text-2xl font-serif">Movie Nights</h2>
-                {canCreate && (
-                    <Button size="sm">
-                        Create Movie Night
-                    </Button>
-                )}
+                {canCreate && <CreateMovieNightButton clubId={club.id} clubNormalizedName={club.normalized_name} />}
             </div>
             {movieNights.length === 0 ? (
                 <p className="text-muted-foreground">This club has no movie nights yet.</p>

@@ -19,6 +19,7 @@ export const passwordSchema = z
 
 
 export const credentialsSchema = z.object({
+    email: z.email({ error: "Invalid email address" }),
     username: z.string().min(4, { error: "Username must be at least 4 characters long" }).max(20, { error: "Username must be at most 20 characters long" }),
     password: passwordSchema
 })

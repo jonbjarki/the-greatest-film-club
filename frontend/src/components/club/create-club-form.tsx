@@ -16,6 +16,9 @@ export default function CreateClubForm() {
     const [state, formAction, pending] = useActionState(createClubAction, initialState);
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
+    // The action state whose errors the user dismissed by editing; a new submit returns a new state, so its errors show again
+    const [dismissedState, setDismissedState] = useState<CreateClubActionState | null>(null);
+    const errors = dismissedState === state ? undefined : state.errors;
     useEffect(() => {
         if (state.message) {
             if (state.success) {
@@ -25,7 +28,7 @@ export default function CreateClubForm() {
                 toast.error(state.message)
             }
         }
-    }, [state.message])
+    }, [state])
 
     const handleChange = (field: "name" | "description", value: string) => {
         if (field === "name") {
@@ -33,7 +36,7 @@ export default function CreateClubForm() {
         } else if (field === "description") {
             setDescription(value);
         }
-        state.errors = undefined;
+        setDismissedState(state);
     };
 
     return (
@@ -42,30 +45,30 @@ export default function CreateClubForm() {
                 <FieldLegend><h2>Create A New Club</h2></FieldLegend>
                 <FieldDescription>Fill out the details below to create a new club.</FieldDescription>
                 <FieldGroup>
-                    <Field data-invalid={!!state.errors?.name && name.length >= NAME_MIN_LENGTH}>
+                    <Field data-invalid={!!errors?.name}>
                         <FieldLabel htmlFor="name">Club Name</FieldLabel>
                         <FieldContent>
-                            <Input autoComplete="off" aria-invalid={!!state.errors?.name && name.length >= NAME_MIN_LENGTH} minLength={NAME_MIN_LENGTH} maxLength={NAME_MAX_LENGTH} type="text" placeholder="Name your club..." name="name" value={name} onChange={(e) => handleChange("name", e.target.value)}></Input>
+                            <Input autoComplete="off" aria-invalid={!!errors?.name} minLength={NAME_MIN_LENGTH} maxLength={NAME_MAX_LENGTH} type="text" placeholder="Name your club..." name="name" value={name} onChange={(e) => handleChange("name", e.target.value)}></Input>
                             <span>{name.length}/{NAME_MAX_LENGTH}</span>
-                            {state.errors?.name && state.errors.name.map((error, index) => (
+                            {errors?.name?.map((error, index) => (
                                 <FieldError key={index}>{error}</FieldError>
                             ))}
                         </FieldContent>
 
 
                     </Field>
-                    <Field data-invalid={!!state.errors?.description && description.length >= DESCRIPTION_MAX_LENGTH}>
+                    <Field data-invalid={!!errors?.description}>
                         <FieldLabel htmlFor="description">Description</FieldLabel>
                         <FieldContent>
                             <Textarea
-                                aria-invalid={!!state.errors?.description && description.length >= DESCRIPTION_MAX_LENGTH}
+                                aria-invalid={!!errors?.description}
                                 maxLength={DESCRIPTION_MAX_LENGTH}
                                 placeholder="Describe your club..."
                                 name="description"
                                 value={description}
                                 onChange={(e) => handleChange("description", e.target.value)} />
                             <span>{description.length}/{DESCRIPTION_MAX_LENGTH}</span>
-                            {state.errors?.description && state.errors.description.map((error, index) => (
+                            {errors?.description?.map((error, index) => (
                                 <FieldError key={index}>{error}</FieldError>
                             ))}
                         </FieldContent>

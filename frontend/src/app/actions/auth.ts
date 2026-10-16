@@ -10,6 +10,7 @@ export type SignUpState = {
     message: string,
     errors?: {
         fieldErrors: {
+            email?: string[],
             username?: string[],
             password?: string[]
         }
@@ -22,6 +23,7 @@ export type SignInState = {
 
 export async function signUpAction(_state: SignUpState, formData: FormData): Promise<SignUpState> {
     const data = {
+        email: formData.get("email"),
         username: formData.get("username"),
         password: formData.get("password")
     }

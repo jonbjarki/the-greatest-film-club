@@ -1,5 +1,12 @@
 import z from "zod";
 
+export const movieVoteSchema = z.object({
+    user_id: z.string(),
+    username: z.string(),
+    image_url: z.string().nullable(),
+    created_at: z.coerce.date()
+});
+
 export const movieItemSchema = z.object({
     id: z.number(),
     name: z.string(),
@@ -10,7 +17,9 @@ export const movieItemSchema = z.object({
     description: z.string().nullable(),
     backdrop_url: z.string().nullable(),
     poster_url: z.string().nullable(),
+    votes: z.array(movieVoteSchema),
 });
+
 
 export const movieListSchema = z.array(movieItemSchema);
 

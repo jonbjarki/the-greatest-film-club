@@ -6,6 +6,8 @@ from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import validates
 from sqlmodel import DateTime, Field, Relationship, SQLModel
 
+from models.club import Club
+
 if TYPE_CHECKING:
     from models.movie import Movie, MovieRead
     from models.user import User
@@ -25,6 +27,13 @@ class MovieNightCreate(MovieNightBase):
 class MovieNightRead(MovieNightBase):
     id: int
     normalized_title: str
+
+
+class MovieNightVoteRead(SQLModel):
+    user_id: uuid.UUID
+    image_url: str | None = None
+    username: str
+    created_at: datetime
 
 
 class MovieNightMovieRead(SQLModel):
@@ -77,6 +86,7 @@ class MovieNightVote(SQLModel, table=True):
     )
 
     movie_entry: MovieNightMovie = Relationship(back_populates="votes")
+    user: User = Relationship()
 
 
 class MovieNight(MovieNightBase, table=True):
@@ -84,6 +94,8 @@ class MovieNight(MovieNightBase, table=True):
     id: int | None = Field(primary_key=True, default=None)
     movie_entries: list[MovieNightMovie] = Relationship(back_populates="movie_night")
     normalized_title: str
+
+    club: Club = Relationship()
 
     @validates("title")
     def normalize_and_set_title(self, key: str, value: str) -> str:

@@ -81,6 +81,10 @@ class ClubUser(SQLModel, table=True):
     user: User = Relationship(back_populates="club_links")
 
 
+class ClubRoleUpdate(SQLModel):
+    role: ClubRole
+
+
 class ClubUserRead(SQLModel):
     club_id: int
     role: ClubRole

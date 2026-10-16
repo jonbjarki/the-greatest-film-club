@@ -1,22 +1,34 @@
 "use client"
-import { createClubAction, CreateClubActionState } from "@/app/actions/club";
 import { CreateMovieNightActionState, createMovieNightAction } from "@/app/actions/movie-night";
 import { useActionState, useEffect, useState } from "react";
-import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "../ui/field";
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "../ui/field";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Textarea } from "../ui/textarea";
 import { toast } from "sonner";
-import { DESCRIPTION_MAX_LENGTH, NAME_MAX_LENGTH, NAME_MIN_LENGTH } from "@/schemas/club-schemas";
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH, TITLE_MIN_LENGTH } from "@/schemas/movie-night-schemas";
+
+type FormField = "title" | "description" | "deadline";
 
 const initialState: CreateMovieNightActionState = {
     success: false,
 };
 
-export default function CreateMovieNightForm() {
-    const [state, formAction, pending] = useActionState(createClubAction, initialState);
+/** Converts a datetime-local value (user's local time, no offset) to an ISO string in UTC. */
+function toIsoDeadline(localValue: string) {
+    return localValue ? new Date(localValue).toISOString() : "";
+}
+
+export default function CreateMovieNightForm({ clubId, clubNormalizedName }: { clubId: number, clubNormalizedName: string }) {
+    const [state, formAction, pending] = useActionState(createMovieNightAction.bind(null, clubId, clubNormalizedName), initialState);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [deadline, setDeadline] = useState("");
+    // Fields edited since the last submit; their stale server errors are hidden. Resets whenever a new state arrives.
+    const [edited, setEdited] = useState<{ state: CreateMovieNightActionState, fields: FormField[] }>({ state, fields: [] });
+    const editedFields = edited.state === state ? edited.fields : [];
+    const errors = (field: FormField) => editedFields.includes(field) ? undefined : state.errors?.[field];
+
     useEffect(() => {
         if (state.message) {
             if (state.success) {
@@ -26,58 +38,72 @@ export default function CreateMovieNightForm() {
                 toast.error(state.message)
             }
         }
-    }, [state.message])
+    }, [state])
 
-    const handleChange = (field: "name" | "description", value: string) => {
-        if (field === "name") {
+    const handleChange = (field: FormField, value: string) => {
+        if (field === "title") {
             setTitle(value);
         } else if (field === "description") {
             setDescription(value);
+        } else {
+            setDeadline(value);
         }
-        state.errors = undefined;
+        if (!editedFields.includes(field)) {
+            setEdited({ state, fields: [...editedFields, field] });
+        }
     };
 
     return (
-        <form className="w-sm mx-auto" action={formAction}>
-            <FieldSet>
-                <FieldLegend><h2>Create A New Movie Night</h2></FieldLegend>
-                <FieldDescription>Fill out the details below to create a new movie night.</FieldDescription>
-                <FieldGroup>
-                    <Field data-invalid={!!state.errors?.name && title.length >= NAME_MIN_LENGTH}>
-                        <FieldLabel htmlFor="name">Movie Night Title</FieldLabel>
-                        <FieldContent>
-                            <Input autoComplete="off" aria-invalid={!!state.errors?.name && title.length >= NAME_MIN_LENGTH} minLength={NAME_MIN_LENGTH} maxLength={NAME_MAX_LENGTH} type="text" placeholder="Title your movie night..." name="name" value={title} onChange={(e) => handleChange("name", e.target.value)}></Input>
-                            <span>{title.length}/{NAME_MAX_LENGTH}</span>
-                            {state.errors?.name && state.errors.name.map((error, index) => (
-                                <FieldError key={index}>{error}</FieldError>
-                            ))}
-                        </FieldContent>
-
-
-                    </Field>
-                    <Field data-invalid={!!state.errors?.description && description.length >= DESCRIPTION_MAX_LENGTH}>
-                        <FieldLabel htmlFor="description">Description</FieldLabel>
-                        <FieldContent>
-                            <Textarea
-                                aria-invalid={!!state.errors?.description && description.length >= DESCRIPTION_MAX_LENGTH}
-                                maxLength={DESCRIPTION_MAX_LENGTH}
-                                placeholder="Describe your club..."
-                                name="description"
-                                value={description}
-                                onChange={(e) => handleChange("description", e.target.value)} />
-                            <span>{description.length}/{DESCRIPTION_MAX_LENGTH}</span>
-                            {state.errors?.description && state.errors.description.map((error, index) => (
-                                <FieldError key={index}>{error}</FieldError>
-                            ))}
-                        </FieldContent>
-                    </Field>
-                </FieldGroup>
-                <FieldGroup>
-                    <Field orientation="horizontal">
-                        <Button type="submit" disabled={pending}>Create</Button>
-                    </Field>
-                </FieldGroup>
-            </FieldSet>
+        <form action={formAction}>
+            <FieldGroup>
+                <Field data-invalid={!!errors("title")}>
+                    <FieldLabel htmlFor="title">Title</FieldLabel>
+                    <FieldContent>
+                        <Input id="title" autoComplete="off" aria-invalid={!!errors("title")} minLength={TITLE_MIN_LENGTH} maxLength={TITLE_MAX_LENGTH} type="text" placeholder="Title your movie night..." name="title" value={title} onChange={(e) => handleChange("title", e.target.value)} required />
+                        <span className="text-xs text-muted-foreground">{title.length}/{TITLE_MAX_LENGTH}</span>
+                        {errors("title")?.map((error, index) => (
+                            <FieldError key={index}>{error}</FieldError>
+                        ))}
+                    </FieldContent>
+                </Field>
+                <Field data-invalid={!!errors("description")}>
+                    <FieldLabel htmlFor="description">Description</FieldLabel>
+                    <FieldContent>
+                        <Textarea
+                            id="description"
+                            aria-invalid={!!errors("description")}
+                            maxLength={DESCRIPTION_MAX_LENGTH}
+                            placeholder="What's the theme of the night? (optional)"
+                            name="description"
+                            value={description}
+                            onChange={(e) => handleChange("description", e.target.value)} />
+                        <span className="text-xs text-muted-foreground">{description.length}/{DESCRIPTION_MAX_LENGTH}</span>
+                        {errors("description")?.map((error, index) => (
+                            <FieldError key={index}>{error}</FieldError>
+                        ))}
+                    </FieldContent>
+                </Field>
+                <Field data-invalid={!!errors("deadline")}>
+                    <FieldLabel htmlFor="deadline">Voting deadline</FieldLabel>
+                    <FieldContent>
+                        <Input
+                            id="deadline"
+                            type="datetime-local"
+                            aria-invalid={!!errors("deadline")}
+                            value={deadline}
+                            onChange={(e) => handleChange("deadline", e.target.value)} />
+                        {/* The server can't know the user's timezone, so send the deadline as UTC */}
+                        <input type="hidden" name="deadline" value={toIsoDeadline(deadline)} />
+                        <FieldDescription>Optional. Voting closes at this time.</FieldDescription>
+                        {errors("deadline")?.map((error, index) => (
+                            <FieldError key={index}>{error}</FieldError>
+                        ))}
+                    </FieldContent>
+                </Field>
+                <Field orientation="horizontal" className="justify-end">
+                    <Button type="submit" disabled={pending}>{pending ? "Creating..." : "Create"}</Button>
+                </Field>
+            </FieldGroup>
         </form>
     )
 }

@@ -15,6 +15,8 @@ from models.movie_night import (
     MovieNightCreate,
     MovieNightMovie,
     MovieNightRead,
+    MovieNightVote,
+    MovieNightVoteRead,
 )
 from models.user import User
 
@@ -28,10 +30,12 @@ async def create_movie_night(
     current_user: Annotated[User, Depends(get_current_user)],
 ):
     club = await session.get(Club, data.club_id)
-    membership = await session.get(ClubUser, (club.id, current_user.id))
 
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
+
+    membership = await session.get(ClubUser, (club.id, current_user.id))
+
     if not membership:
         raise HTTPException(status_code=403, detail="User is not a member of this club")
     if (
@@ -76,6 +80,13 @@ async def get_movie_nights_for_club(
     club = await session.get(Club, club_id)
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
+    membership = await session.get(ClubUser, (club.id, current_user.id))
+    if not membership:
+        raise HTTPException(status_code=403, detail="User is not a member of this club")
+    if membership.status != ClubMemberStatus.ACTIVE:
+        raise HTTPException(
+            status_code=403, detail="User is not an active member of this club"
+        )
     result = await session.execute(
         select(MovieNight).where(MovieNight.club_id == club_id)
     )
@@ -146,14 +157,135 @@ async def get_movies_for_movie_night(
     session: Annotated[AsyncSession, Depends(get_session)],
     current_user: Annotated[User, Depends(get_current_user)],
 ):
+
     movie_night = await session.get(
         MovieNight,
         movie_night_id,
         options=[
             selectinload(MovieNight.movie_entries).selectinload(MovieNightMovie.movie),
+            selectinload(MovieNight.movie_entries)
+            .selectinload(MovieNightMovie.votes)
+            .selectinload(MovieNightVote.user),
         ],
     )
     if not movie_night:
         raise HTTPException(status_code=404, detail="Movie night not found")
-    movies = [entry.movie for entry in movie_night.movie_entries]
+
+    membership = await session.get(ClubUser, (movie_night.club_id, current_user.id))
+    if not membership:
+        raise HTTPException(status_code=403, detail="User is not a member of this club")
+    if membership.status != ClubMemberStatus.ACTIVE:
+        raise HTTPException(
+            status_code=403, detail="User is not an active member of this club"
+        )
+
+    movies = [
+        {
+            **entry.movie.model_dump(),
+            "votes": [
+                MovieNightVoteRead(
+                    user_id=vote.user_id,
+                    image_url=vote.user.image_url,
+                    username=vote.user.username,
+                    created_at=vote.created_at,
+                )
+                for vote in entry.votes
+            ],
+        }
+        for entry in movie_night.movie_entries
+    ]
     return movies
+
+
+@router.post("/{movie_night_id}/movies/{movie_id}/vote")
+async def vote_for_movie_in_movie_night(
+    movie_night_id: int,
+    movie_id: int,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    movie_night = await session.get(MovieNight, movie_night_id)
+    if not movie_night:
+        raise HTTPException(status_code=404, detail="Movie night not found")
+
+    membership = await session.get(ClubUser, (movie_night.club_id, current_user.id))
+    if not membership:
+        raise HTTPException(status_code=403, detail="User is not a member of this club")
+    if membership.status != ClubMemberStatus.ACTIVE:
+        raise HTTPException(
+            status_code=403, detail="User is not an active member of this club"
+        )
+
+    movie_entry = await session.execute(
+        select(MovieNightMovie).where(
+            MovieNightMovie.movie_night_id == movie_night_id,
+            MovieNightMovie.movie_id == movie_id,
+        )
+    )
+    movie_entry = movie_entry.scalar_one_or_none()
+    if not movie_entry:
+        raise HTTPException(
+            status_code=404, detail="Movie not found in this movie night"
+        )
+
+    existing_vote = await session.get(
+        MovieNightVote,
+        (movie_entry.id, current_user.id),
+    )
+    if existing_vote:
+        raise HTTPException(
+            status_code=409, detail="User has already voted for this movie"
+        )
+
+    vote = MovieNightVote(
+        movie_night_movie_id=movie_entry.id,
+        user_id=current_user.id,
+    )
+    session.add(vote)
+    await session.commit()
+    await session.refresh(vote)
+    return vote
+
+
+@router.delete("/{movie_night_id}/movies/{movie_id}/vote")
+async def remove_vote_for_movie_in_movie_night(
+    movie_night_id: int,
+    movie_id: int,
+    session: Annotated[AsyncSession, Depends(get_session)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    movie_night = await session.get(MovieNight, movie_night_id)
+    if not movie_night:
+        raise HTTPException(status_code=404, detail="Movie night not found")
+
+    membership = await session.get(ClubUser, (movie_night.club_id, current_user.id))
+    if not membership:
+        raise HTTPException(status_code=403, detail="User is not a member of this club")
+    if membership.status != ClubMemberStatus.ACTIVE:
+        raise HTTPException(
+            status_code=403, detail="User is not an active member of this club"
+        )
+
+    movie_entry = await session.execute(
+        select(MovieNightMovie).where(
+            MovieNightMovie.movie_night_id == movie_night_id,
+            MovieNightMovie.movie_id == movie_id,
+        )
+    )
+    movie_entry = movie_entry.scalar_one_or_none()
+    if not movie_entry:
+        raise HTTPException(
+            status_code=404, detail="Movie not found in this movie night"
+        )
+
+    existing_vote = await session.get(
+        MovieNightVote,
+        (movie_entry.id, current_user.id),
+    )
+    if not existing_vote:
+        raise HTTPException(status_code=404, detail="Vote not found")
+
+    await session.delete(existing_vote)
+    await session.commit()
+    await session.refresh(movie_entry)
+    return {"detail": "Vote removed successfully"}

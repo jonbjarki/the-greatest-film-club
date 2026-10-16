@@ -1,17 +1,23 @@
 import { getClubByNameAction } from "@/app/actions/club";
 import { getMovieNightByTitleAction, getMovieNightMoviesAction } from "@/app/actions/movie-night";
+import { canManageClub } from "@/lib/club-permissions";
 import AddMovieButton from "@/components/add-movie/add-movie-button";
 import MovieList from "@/components/movie/movie-list";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { auth } from "@/../auth";
 
-async function MovieNightMovies({ movieNightId }: { movieNightId: number }) {
+async function MovieNightMovies({ movieNightId, user_id }: { movieNightId: number, user_id: string }) {
     const movies = await getMovieNightMoviesAction(movieNightId);
-    return <MovieList movies={movies} />;
+    return <MovieList movies={movies} movieNightId={movieNightId} user_id={user_id} />;
 }
 
 export default async function MovieNightPage(props: PageProps<"/clubs/view/[name]/movie-nights/[title]">) {
+    const session = await auth()
+    if (!session) {
+        notFound();
+    }
     const params = await props.params;
     const club = await getClubByNameAction(decodeURIComponent(params.name));
     if (!club) {
@@ -21,11 +27,11 @@ export default async function MovieNightPage(props: PageProps<"/clubs/view/[name
     if (!movieNight) {
         notFound();
     }
-    const canAddMovies = club.member?.status === "active" && (club.member.role === "admin" || club.member.role === "owner");
+    const canAddMovies = canManageClub(club);
 
     return (
-        <main className="flex flex-col gap-4 p-4 mx-auto max-w-3xl lg:max-w-6xl">
-            <Link href={`/clubs/view/${encodeURIComponent(club.normalized_name)}`} className="text-sm underline">&larr; {club.name}</Link>
+        <div className="flex flex-col gap-4">
+            <Link href={`/clubs/view/${encodeURIComponent(club.normalized_name)}/movie-nights`} className="text-sm underline">&larr; Movie Nights</Link>
             <div className="flex items-start justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-medium">{movieNight.title}</h1>
@@ -37,8 +43,8 @@ export default async function MovieNightPage(props: PageProps<"/clubs/view/[name
                 {canAddMovies && <AddMovieButton movieNightId={movieNight.id} />}
             </div>
             <Suspense fallback={<div>Loading movies...</div>}>
-                <MovieNightMovies movieNightId={movieNight.id} />
+                <MovieNightMovies movieNightId={movieNight.id} user_id={session.user.id} />
             </Suspense>
-        </main>
+        </div>
     );
 }

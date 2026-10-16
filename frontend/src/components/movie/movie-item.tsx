@@ -1,13 +1,18 @@
 ﻿"use client"
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { DialogContent, DialogHeader, Dialog, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { DialogContent, DialogHeader, Dialog, DialogTrigger, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import Image from "next/image"
 import { MovieItemType } from "@/schemas/movie-schemas";
 import { useState } from "react";
+import { Button } from "../ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import ProfileImageWithFallback from "../profile/profile-image-with-fallback";
+import Link from "next/link";
+import VoteForm from "./vote-form";
 
-export default function MovieItem({ movie }: { movie: MovieItemType }) {
+export default function MovieItem({ movie, movieNightId, user_id }: { movie: MovieItemType, movieNightId: number, user_id: string }) {
     const [isOpen, setIsOpen] = useState(false);
-
+    const userVoted = movie.votes.some(vote => vote.user_id === user_id);
     return (
         <li>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -69,6 +74,39 @@ export default function MovieItem({ movie }: { movie: MovieItemType }) {
                             <span className="font-medium text-foreground">Starring:</span> {movie.actor_names.join(", ")}
                         </p>
                     </div>
+                    <DialogFooter>
+                        <div className="flex flex-col w-full">
+                            <VoteForm
+                                movieNightId={movieNightId}
+                                movieId={movie.id}
+                                userVoted={userVoted}
+                                handleClose={() => setIsOpen(false)}
+                            />
+                            {movie.votes.length > 0 && (
+                                <>
+                                    <p className="mb-2 font-medium text-foreground">Votes:</p>
+                                    <ul className="flex flex-row gap-2 flex-wrap self-start w-full">
+                                        {movie.votes.map(user => (
+                                            <li key={user.user_id} className="w-10 h-10">
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Link href={`/profile/${encodeURIComponent(user.username)}`}>
+                                                            <ProfileImageWithFallback src={user.image_url ?? ""} alt={user.username} username={user.username} size="small" />
+                                                        </Link>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{user.username}</p>
+                                                    </TooltipContent>
+
+
+                                                </Tooltip>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </>
+                            )}
+                        </div>
+                    </DialogFooter>
                 </DialogContent>
             </Dialog>
         </li >

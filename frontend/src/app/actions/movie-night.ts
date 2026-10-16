@@ -1,52 +1,102 @@
 "use server"
 
 import { authenticatedFetch } from "@/lib/auth"
-import { createMovieNightSchema, movieNightListSchema } from "@/schemas/movie-night-schemas";
+import { createMovieNightSchema, movieNightListSchema, movieNightSchema, normalizeMovieNightTitle } from "@/schemas/movie-night-schemas";
 import { MovieItemType, movieItemSchema, movieListSchema } from "@/schemas/movie-schemas";
 import { updateTag } from "next/cache";
-import { auth } from "@/../auth";
-import { title } from "process";
+import { redirect } from "next/navigation";
+import { flattenError } from "zod";
 
-export type CreateMovieNightActionState = {
-    message?: string,
-    success: boolean,
+export interface CreateMovieNightActionState {
     errors?: {
-        name?: string[],
+        title?: string[],
         description?: string[],
         deadline?: string[]
     }
+    message?: string,
+    success: boolean
 }
 
-export async function createMovieNightAction(_prevState: CreateMovieNightActionState, formData: FormData, clubId: number): Promise<CreateMovieNightActionState> {
-    void _prevState;
-    const session = await auth();
-    if (!session) return { message: "Not authenticated", success: false };
+/** Maps FastAPI 422 validation errors ({ detail: [{ loc: ["body", field], msg }] }) to form field errors. */
+async function parseValidationErrors(res: Response): Promise<CreateMovieNightActionState["errors"] | null> {
+    try {
+        const body = await res.json();
+        const errors: NonNullable<CreateMovieNightActionState["errors"]> = {};
+        for (const detail of body.detail ?? []) {
+            const field: unknown = detail.loc?.at(-1);
+            if (field === "title" || field === "description" || field === "deadline") {
+                (errors[field] ??= []).push(detail.msg);
+            }
+        }
+        return Object.keys(errors).length > 0 ? errors : null;
+    } catch {
+        return null;
+    }
+}
 
-    const user = session?.user
-    const data = createMovieNightSchema.parse({
-        title: formData.get("title")?.toString() ?? "",
-        description: formData.get("description")?.toString() ?? null,
-        deadline: formData.get("deadline")?.toString() ?? null,
+export async function createMovieNightAction(clubId: number, clubNormalizedName: string, _prevState: CreateMovieNightActionState, formData: FormData): Promise<CreateMovieNightActionState> {
+    void _prevState;
+    const validation = createMovieNightSchema.safeParse({
+        title: formData.get("title") ?? "",
+        description: formData.get("description"),
+        deadline: formData.get("deadline"),
         club_id: clubId
     });
 
-    const res = await authenticatedFetch(`/movie-nights`, {
+    if (!validation.success) {
+        return {
+            errors: flattenError(validation.error).fieldErrors,
+            success: false
+        };
+    }
+
+    const validatedData = validation.data;
+
+    // The backend doesn't enforce unique titles, but movie nights are routed by normalized title
+    const existing = await getMovieNightsAction(clubId);
+    const normalizedTitle = normalizeMovieNightTitle(validatedData.title);
+    if (existing.some((movieNight) => movieNight.normalized_title === normalizedTitle)) {
+        return {
+            errors: { title: ["This club already has a movie night with this title."] },
+            success: false
+        };
+    }
+
+    const res = await authenticatedFetch(`/movie-nights/`, {
         method: "POST",
-        body: JSON.stringify(data),
         headers: {
             "Content-Type": "application/json"
-        }
+        },
+        body: JSON.stringify(validatedData)
     });
 
     if (!res.ok) {
-        if (res.status == 400) {
-            return { success: false, errors: await res.json() };
+        if (res.status == 403) {
+            return { message: "Only active club admins and owners can create movie nights.", success: false };
         }
-        console.error("Failed to create movie night", await res.text());
+        if (res.status == 404) {
+            return { message: "This club no longer exists.", success: false };
+        }
+        if (res.status == 409) {
+            return {
+                errors: { title: ["This club already has a movie night with this title."] },
+                success: false
+            };
+        }
+        if (res.status == 422) {
+            const errors = await parseValidationErrors(res);
+            if (errors) {
+                return { errors, success: false };
+            }
+            return { message: "Some of the movie night details are invalid.", success: false };
+        }
+        const error = await res.text();
+        console.error("Error occurred when creating movie night " + res.statusText, error)
         return { message: "Failed to create movie night, try again later", success: false };
     }
 
-    return { message: "Movie night created", success: true };
+    const newMovieNight = movieNightSchema.parse(await res.json());
+    redirect(`/clubs/view/${encodeURIComponent(clubNormalizedName)}/movie-nights/${encodeURIComponent(newMovieNight.normalized_title)}`);
 }
 
 
