@@ -10,6 +10,7 @@ function memberOrder(member: ClubMember) {
     return member.role === "admin" ? 1 : 2;
 }
 
+
 export default async function ClubMembers({ clubId }: { clubId: number }) {
     const members = (await getClubMembersAction(clubId)).filter(i => i.status !== "invited");
     const sorted = [...members].sort((a, b) =>
