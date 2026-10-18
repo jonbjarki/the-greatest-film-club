@@ -91,6 +91,12 @@ class MovieNightVote(SQLModel, table=True):
 
 class MovieNight(MovieNightBase, table=True):
     __tablename__ = "movie_night"
+    # Movie nights are routed by normalized title, so it must be unique per club
+    __table_args__ = (
+        UniqueConstraint(
+            "club_id", "normalized_title", name="uq_movie_night_club_title"
+        ),
+    )
     id: int | None = Field(primary_key=True, default=None)
     movie_entries: list[MovieNightMovie] = Relationship(back_populates="movie_night")
     normalized_title: str

@@ -1,7 +1,9 @@
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -21,6 +23,19 @@ from models.movie_night import (
 from models.user import User
 
 router = APIRouter(tags=["Movie Night"], prefix="/movie-nights")
+
+
+def ensure_voting_open(movie_night: MovieNight) -> None:
+    """Raises if the movie night's voting deadline has passed."""
+    deadline = movie_night.deadline
+    if deadline is None:
+        return
+    if deadline.tzinfo is None:
+        deadline = deadline.replace(tzinfo=UTC)
+    if deadline <= datetime.now(UTC):
+        raise HTTPException(
+            status_code=403, detail="Voting for this movie night has closed"
+        )
 
 
 @router.post("/")
@@ -56,7 +71,14 @@ async def create_movie_night(
     )
 
     session.add(new_movie_night)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(
+            status_code=409,
+            detail="This club already has a movie night with this title",
+        )
     await session.refresh(new_movie_night)
     return new_movie_night
 
@@ -215,6 +237,7 @@ async def vote_for_movie_in_movie_night(
         raise HTTPException(
             status_code=403, detail="User is not an active member of this club"
         )
+    ensure_voting_open(movie_night)
 
     movie_entry = await session.execute(
         select(MovieNightMovie).where(
@@ -265,6 +288,7 @@ async def remove_vote_for_movie_in_movie_night(
         raise HTTPException(
             status_code=403, detail="User is not an active member of this club"
         )
+    ensure_voting_open(movie_night)
 
     movie_entry = await session.execute(
         select(MovieNightMovie).where(

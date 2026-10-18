@@ -5,7 +5,7 @@ import { Suspense } from "react";
 
 export default async function ClubMovieNightsPage(props: PageProps<"/clubs/view/[name]/movie-nights">) {
     const params = await props.params;
-    const club = await getClubByNameAction(decodeURIComponent(params.name));
+    const club = await getClubByNameAction(params.name);
     if (!club) {
         notFound();
     }

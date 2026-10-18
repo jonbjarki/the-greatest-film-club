@@ -4,8 +4,8 @@ method: POST
 body:
   type: urlencoded
   content:
-    username: nonni
-    password: Abc.123
+    username: "{{vault:POSTMAN_USERNAME}}"
+    password: "{{vault:POSTMAN_PASSWORD}}"
     grant_type: password
 auth:
   type: inherit

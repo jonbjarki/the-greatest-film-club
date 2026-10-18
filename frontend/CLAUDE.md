@@ -61,7 +61,7 @@ The top-level `components/` folder (outside `src`) is empty — put components i
   - Mutations used with forms take `(prevState, formData)` and return a state object (`{ success/error, message?, errors?: fieldErrors }`); exported `XxxActionState` types live next to the action.
   - Redirect after create with `redirect(...)`; invalidate cached reads with `updateTag(tag)`.
 - **Forms**: client components with `useActionState(action, initialState)`, shadcn `Field*` components for layout/errors, `toast` in a `useEffect` on `state.message`. Pass extra args via `action.bind(null, id)` or hidden inputs.
-- **Pages**: async Server Components that `await props.params`, `decodeURIComponent` the slug, fetch via actions, `notFound()` when missing, and wrap slower sections in `<Suspense>`.
+- **Pages**: async Server Components that `await props.params` (already URL-decoded by Next — don't `decodeURIComponent` again, it throws on titles containing `%`), fetch via actions, `notFound()` when missing, and wrap slower sections in `<Suspense>`.
 - **URLs use normalized slugs**: clubs are routed by `normalized_name`, movie nights by `normalized_title` (backend-generated). Build links with `encodeURIComponent(club.normalized_name)`.
 - Club membership/permissions come back on `club.member` (`role`: member | admin | owner, `status`: active | invited); UI gates admin actions on that.
 - Components: one default-exported component per file, kebab-case filenames, relative imports for `../ui/*` inside `src/components` and `@/` elsewhere.

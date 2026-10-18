@@ -15,28 +15,38 @@ export async function searchForMovie(query: string) {
 
 
 
-export async function voteForMovie(movieNightId: number, movieId: number) {
+export type VoteResult = { success: true } | { success: false, message: string };
+
+export async function voteForMovie(movieNightId: number, movieId: number): Promise<VoteResult> {
     const res = await authenticatedFetch(`/movie-nights/${movieNightId}/movies/${movieId}/vote`, {
         method: "POST"
     });
 
     if (!res.ok) {
+        if (res.status == 403) {
+            const { detail } = await res.json().catch(() => ({ detail: null }));
+            return { success: false, message: detail ?? "You can't vote in this movie night" };
+        }
         throw new Error(`Failed to vote for movie: ${res.statusText}`);
     }
 
     updateTag("movies");
-    return true;
+    return { success: true };
 }
 
-export async function unvoteForMovie(movieNightId: number, movieId: number) {
+export async function unvoteForMovie(movieNightId: number, movieId: number): Promise<VoteResult> {
     const res = await authenticatedFetch(`/movie-nights/${movieNightId}/movies/${movieId}/vote`, {
         method: "DELETE"
     });
 
     if (!res.ok) {
+        if (res.status == 403) {
+            const { detail } = await res.json().catch(() => ({ detail: null }));
+            return { success: false, message: detail ?? "You can't unvote in this movie night" };
+        }
         throw new Error(`Failed to unvote for movie: ${res.statusText}`);
     }
 
     updateTag("movies");
-    return true;
+    return { success: true };
 }

@@ -19,11 +19,11 @@ export default async function MovieNightPage(props: PageProps<"/clubs/view/[name
         notFound();
     }
     const params = await props.params;
-    const club = await getClubByNameAction(decodeURIComponent(params.name));
+    const club = await getClubByNameAction(params.name);
     if (!club) {
         notFound();
     }
-    const movieNight = await getMovieNightByTitleAction(club.id, decodeURIComponent(params.title));
+    const movieNight = await getMovieNightByTitleAction(club.id, params.title);
     if (!movieNight) {
         notFound();
     }

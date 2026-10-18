@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import func, select
 
@@ -12,7 +13,7 @@ from auth import (
     hash_password,
 )
 from database import get_session
-from models.user import User, UserRead, UserRegister
+from models.user import User, UserPrivateRead, UserRegister
 
 router = APIRouter(tags=["auth"], prefix="/auth")
 
@@ -48,7 +49,7 @@ async def login(
     }
 
 
-@router.post("/register", response_model=UserRead)
+@router.post("/register", response_model=UserPrivateRead)
 async def register_user(
     form_data: Annotated[UserRegister, Form()],
     session: Annotated[AsyncSession, Depends(get_session)],
@@ -58,6 +59,12 @@ async def register_user(
     )
     if existing_user.first():
         raise HTTPException(status_code=400, detail="Username already registered")
+
+    existing_email = await session.exec(
+        select(User).where(func.lower(User.email) == form_data.email.lower())
+    )
+    if existing_email.first():
+        raise HTTPException(status_code=400, detail="Email already registered")
 
     # Validate the user registration data using the UserRegister model
     try:
@@ -70,12 +77,18 @@ async def register_user(
         )
         session.add(user)
         await session.commit()
-        await session.refresh(user)
-        return user
+    except IntegrityError:
+        # Another registration claimed the username or email after the checks above
+        await session.rollback()
+        raise HTTPException(
+            status_code=400, detail="Username or email already registered"
+        )
     except ValueError as e:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=e.errors()
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(e)
         )
+    await session.refresh(user)
+    return user
 
 
 # @router.post("/refresh")

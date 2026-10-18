@@ -42,7 +42,6 @@ def validate_username_format(value: str) -> str:
 
 
 class UserBase(SQLModel):
-    email: EmailStr
     username: str
     image_url: str | None = Field(default=None)
     bio: str | None = Field(default=None, min_length=20, max_length=300)
@@ -51,6 +50,12 @@ class UserBase(SQLModel):
 class UserRead(UserBase):
     id: uuid.UUID
     created_at: datetime
+
+
+class UserPrivateRead(UserRead):
+    """The caller's own account, including fields hidden from other users."""
+
+    email: EmailStr
 
 
 class UserUpdate(UserBase):
@@ -65,6 +70,7 @@ class UserUpdate(UserBase):
 
 
 class UserRegister(UserBase):
+    email: EmailStr
     password: SecretStr = Field(min_length=6, max_length=128)
     username: str = Field(min_length=4, max_length=20)
 

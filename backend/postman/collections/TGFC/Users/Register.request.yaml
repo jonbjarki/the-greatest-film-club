@@ -6,12 +6,12 @@ body:
   content:
     - type: text
       key: username
-      value: nonni
+      value: "{{vault:POSTMAN_USERNAME}}"
       description: ""
       disabled: false
     - type: text
       key: password
-      value: Abc.123
+      value: "{{vault:POSTMAN_PASSWORD}}"
       description: ""
       disabled: false
 order: 1789603235996

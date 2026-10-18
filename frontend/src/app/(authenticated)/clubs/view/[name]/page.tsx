@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 
 export default async function ClubPage(props: PageProps<"/clubs/view/[name]">) {
     const params = await props.params;
-    const club = await getClubByNameAction(decodeURIComponent(params.name));
+    const club = await getClubByNameAction(params.name);
     if (!club) {
         notFound();
     }

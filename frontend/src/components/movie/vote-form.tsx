@@ -12,8 +12,8 @@ export default function VoteForm({ movieNightId, movieId, userVoted, handleClose
         startTransition(async () => {
             const result = userVoted ? await unvoteForMovie(movieNightId, movieId) : await voteForMovie(movieNightId, movieId);
 
-            if (!result) {
-                toast.error("Failed to " + (userVoted ? "unvote for movie" : "vote for movie"));
+            if (!result.success) {
+                toast.error(result.message);
             } else {
                 if (userVoted) {
                     toast.success("Successfully removed vote");

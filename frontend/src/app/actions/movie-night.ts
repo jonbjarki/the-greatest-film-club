@@ -52,7 +52,8 @@ export async function createMovieNightAction(clubId: number, clubNormalizedName:
 
     const validatedData = validation.data;
 
-    // The backend doesn't enforce unique titles, but movie nights are routed by normalized title
+    // Movie nights are routed by normalized title, so it must be unique per club.
+    // The backend also enforces this and returns 409 on a conflict
     const existing = await getMovieNightsAction(clubId);
     const normalizedTitle = normalizeMovieNightTitle(validatedData.title);
     if (existing.some((movieNight) => movieNight.normalized_title === normalizedTitle)) {

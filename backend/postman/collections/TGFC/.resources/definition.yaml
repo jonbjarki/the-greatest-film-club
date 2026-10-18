@@ -23,14 +23,14 @@ auth:
       - key: tokenName
         value: jwt
       - key: clientSecret
-        value: 5f1acae31d259208b0e2f59fef52b7ecac8425116ec904488daf44bc7027040e
+        value: "{{vault:OAUTH_CLIENT_SECRET}}"
       - key: accessTokenUrl
         value: "{{base_url}}/auth/login"
       - key: grant_type
         value: password_credentials
       - key: username
-        value: nonni
+        value: "{{vault:POSTMAN_USERNAME}}"
       - key: password
-        value: Abc.1234
+        value: "{{vault:POSTMAN_PASSWORD}}"
       - key: id
         value: collection/A8F1f22CDBa16f3e3EA73a2C/b1397e40-6f0b-4456-b047-d6ba94a4669b/filesystem

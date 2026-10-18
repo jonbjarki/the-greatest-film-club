@@ -10,7 +10,7 @@ import { Suspense } from "react";
 
 export default async function ClubSettingsPage(props: PageProps<"/clubs/view/[name]/settings">) {
     const params = await props.params;
-    const club = await getClubByNameAction(decodeURIComponent(params.name));
+    const club = await getClubByNameAction(params.name);
     if (!club) {
         notFound();
     }

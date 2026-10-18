@@ -41,6 +41,7 @@ export default function Page() {
                         <FieldError key={error} className="text-xs">{error}</FieldError>
                     )}
                 </Field>
+                {state.error && <FieldError className="text-xs">{state.error}</FieldError>}
                 <div className="flex justify-between">
                     <Button disabled={pending} type="submit">Sign Up</Button>
                     <Link href="/login">Or Sign In</Link>

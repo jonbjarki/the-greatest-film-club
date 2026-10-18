@@ -4,6 +4,7 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 from sqlmodel import func, select
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -21,6 +22,7 @@ from models.club import (
     ClubRoleUpdate,
     ClubUser,
     ClubUserRead,
+    normalize_name,
 )
 from models.user import User
 
@@ -53,7 +55,10 @@ async def create_club(
     session: Annotated[AsyncSession, Depends(get_session)],
     current_user: Annotated[User, Depends(get_current_user)],
 ):
-    statement = await session.exec(select(Club).where(Club.name == data.name))
+    # Clubs are unique by their normalized name, so "Film Club" and "film club" clash
+    statement = await session.exec(
+        select(Club).where(Club.normalized_name == normalize_name(data.name))
+    )
     existing = statement.first()
     if existing:
         raise HTTPException(
@@ -65,7 +70,14 @@ async def create_club(
         description=data.description,
     )
     session.add(new_club)
-    await session.commit()
+    try:
+        await session.commit()
+    except IntegrityError:
+        # Another request created a club with the same name after the check above
+        await session.rollback()
+        raise HTTPException(
+            status_code=409, detail="A club with this name already exists"
+        )
     await session.refresh(new_club)
 
     link = ClubUser(
@@ -92,8 +104,10 @@ async def get_club_by_id(
     club = await session.get(Club, club_id)
     if not club:
         raise HTTPException(status_code=404, detail="Club not found")
-    member = await session.exec(select(ClubUser).where(ClubUser.club_id == club_id))
-    return {**club.model_dump(), "member": member.first()}
+    member = await session.get(ClubUser, (club_id, current_user.id))
+    if not member:
+        raise HTTPException(status_code=404, detail="You are not a member of this club")
+    return {**club.model_dump(), "member": member}
 
 
 @router.get("/name/{club_name}")
@@ -108,7 +122,6 @@ async def get_club_by_name(
             detail="Name must only contain letters, numbers, and hyphens",
         )
 
-    print(f"Searching for club with name: {club_name}")
     statement = await session.exec(
         select(Club).where(Club.normalized_name == club_name.lower())
     )

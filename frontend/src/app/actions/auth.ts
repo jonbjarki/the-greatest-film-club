@@ -47,6 +47,13 @@ export async function signUpAction(_state: SignUpState, formData: FormData): Pro
     });
     if (!res.ok) {
         if (res.status == 400) {
+            const { detail } = await res.json().catch(() => ({ detail: null }));
+            if (detail === "Email already registered") {
+                return { error: null, message: "", errors: { fieldErrors: { email: ["This email is already registered"] } } };
+            }
+            if (detail === "Username already registered") {
+                return { error: null, message: "", errors: { fieldErrors: { username: ["This username is already taken"] } } };
+            }
             return {
                 error: "User already exists",
                 message: ""
