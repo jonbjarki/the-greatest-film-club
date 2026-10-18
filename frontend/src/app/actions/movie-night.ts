@@ -153,7 +153,6 @@ export async function addMovieToMovieNightAction(_prevState: AddMovieActionState
         console.error("Failed to add movie", await res.text());
         return { message: "Failed to add movie, try again later", error: true };
     }
-    movieItemSchema.parse(await res.json());
     updateTag(`movie-night-${movieNightId}`);
     return { message: "Movie added", error: false };
 }
