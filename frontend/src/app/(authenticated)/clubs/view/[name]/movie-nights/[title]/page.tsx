@@ -37,7 +37,7 @@ export default async function MovieNightPage(props: PageProps<"/clubs/view/[name
                     <h1 className="text-3xl font-medium">{movieNight.title}</h1>
                     {movieNight.description && <p className="text-muted-foreground max-w-prose mb-2">{movieNight.description}</p>}
                     {movieNight.deadline && (
-                        <p className="text-sm">Vote Deadline: {new Date(movieNight.deadline).toLocaleDateString()}</p>
+                        <p className="text-sm">Vote Deadline: {new Date(movieNight.deadline).toLocaleDateString()} {new Date(movieNight.deadline).toLocaleTimeString()}</p>
                     )}
                 </div>
                 {canAddMovies && <AddMovieButton movieNightId={movieNight.id} />}
