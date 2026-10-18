@@ -14,12 +14,19 @@ const initialState: SignUpState = {
 }
 
 export default function Page() {
-    const [formData, setFormData] = useState({ username: "", password: "" });
+    const [formData, setFormData] = useState({ email: "", username: "", password: "" });
     const [state, formAction, pending] = useActionState(signUpAction, initialState)
     return (
         <main className="h-full w-full flex flex-col items-center justify-center mt-10">
             <h2 className="mb-5 text-xl font-heading font-medium">REGISTER</h2>
             <form action={formAction} className="w-full max-w-xs flex flex-col gap-4">
+                <Field>
+                    <FieldLabel className="text-base" htmlFor="email">Email</FieldLabel>
+                    <Input id="email" name="email" type="email" autoComplete="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                    {state.errors?.fieldErrors.email?.map(error =>
+                        <FieldError key={error} className="text-xs">{error}</FieldError>
+                    )}
+                </Field>
                 <Field>
                     <FieldLabel className="text-base" htmlFor="username">Username</FieldLabel>
                     <Input id="username" name="username" type="text" autoComplete="username" value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} />
@@ -34,6 +41,7 @@ export default function Page() {
                         <FieldError key={error} className="text-xs">{error}</FieldError>
                     )}
                 </Field>
+                {state.error && <FieldError className="text-xs">{state.error}</FieldError>}
                 <div className="flex justify-between">
                     <Button disabled={pending} type="submit">Sign Up</Button>
                     <Link href="/login">Or Sign In</Link>

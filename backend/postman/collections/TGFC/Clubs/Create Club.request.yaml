@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/clubs/"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"name\": \"Club 2\",\r
+
+    \    \"description\": \"Test club\"\r
+
+    }"
+order: 3712769237602251

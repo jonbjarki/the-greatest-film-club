@@ -1,4 +1,4 @@
-import { MovieSearchItemType } from "@/lib/schemas";
+import { MovieSearchItemType } from "@/schemas/movie-schemas";
 import { Button } from "../ui/button";
 
 export default function MovieSearchItem({ movie, pending }: { movie: MovieSearchItemType, pending: boolean }) {

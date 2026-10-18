@@ -1,7 +1,5 @@
-import { User } from "next-auth";
-import Image from "next/image";
 import ProfileImageWithFallback from "./profile-image-with-fallback";
-import { UserProfile } from "@/lib/schemas";
+import { UserProfile } from "@/schemas/user-schemas";
 
 export default function ProfileIcon({ user }: { user: UserProfile }) {
 

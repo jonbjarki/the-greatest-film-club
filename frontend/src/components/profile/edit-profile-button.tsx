@@ -1,12 +1,11 @@
 "use client"
 
-import { Label } from "../ui/label"
 import { Button } from "../ui/button"
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog"
-import { Field, FieldContent, FieldDescription, FieldError, FieldGroup } from "../ui/field"
+import { Field, FieldContent, FieldDescription, FieldError, FieldGroup, FieldLabel } from "../ui/field"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
-import { UserProfile } from "@/lib/schemas"
+import { UserProfile } from "@/schemas/user-schemas"
 import { useState } from "react"
 import { upload } from "@vercel/blob/client"
 import { updateProfileAction } from "@/app/actions/user"
@@ -116,7 +115,7 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
                 <form onSubmit={handleSubmit}>
                     <FieldGroup>
                         <Field data-invalid={usernameErrors.length > 0}>
-                            <Label htmlFor="username">Username</Label>
+                            <FieldLabel htmlFor="username">Username</FieldLabel>
                             <Input id="username" name="username"
                                 defaultValue={username}
                                 aria-invalid={usernameErrors.length > 0}
@@ -128,7 +127,7 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
                             )}
                         </Field>
                         <Field data-invalid={bioErrors.length > 0}>
-                            <Label htmlFor="bio">Bio</Label>
+                            <FieldLabel htmlFor="bio">Bio</FieldLabel>
                             <Textarea
                                 id="bio"
                                 name="bio"
@@ -149,7 +148,7 @@ export default function EditProfileButton({ user }: { user: UserProfile }) {
                             </div>
                         </Field>
                         <Field>
-                            <Label htmlFor="image">Profile Image </Label>
+                            <FieldLabel htmlFor="image">Profile Image </FieldLabel>
                             <FieldContent>
                                 <Input type="file" id="image" name="image" accept="image/jpeg,image/png,image/webp" onChange={(e) => {
                                     setImage(e.target.files?.[0] ?? null)

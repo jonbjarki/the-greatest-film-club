@@ -1,18 +1,18 @@
-"use client"
-import { Card, CardHeader, CardTitle, CardDescription, CardAction } from "@/components/ui/card";
-import { DialogContent, DialogHeader, DialogFooter, Dialog, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+﻿"use client"
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { DialogContent, DialogHeader, Dialog, DialogTrigger, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import Image from "next/image"
-import { Badge } from "../ui/badge";
-import VoteForm from "./vote-form";
-import { MovieItemType } from "@/lib/schemas";
+import { MovieItemType } from "@/schemas/movie-schemas";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import ProfileImageWithFallback from "../profile/profile-image-with-fallback";
 import Link from "next/link";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { useState } from "react";
+import VoteForm from "./vote-form";
 
-export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, onVoted: (movie: MovieItemType) => Promise<void> }) {
+export default function MovieItem({ movie, movieNightId, user_id }: { movie: MovieItemType, movieNightId: number, user_id: string }) {
     const [isOpen, setIsOpen] = useState(false);
-    const handleClose = () => setIsOpen(false);
+    const userVoted = movie.votes.some(vote => vote.user_id === user_id);
     return (
         <li>
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -34,11 +34,8 @@ export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, on
                             )}
                         </div>
                         <CardHeader className="p-4">
-                            <CardAction>
-                                <Badge className="" variant="ghost">{movie.vote_count} votes</Badge>
-                            </CardAction>
                             <CardTitle>{movie.name}</CardTitle>
-                            <CardDescription>{movie.release_year} · {movie.genres.join(", ")}</CardDescription>
+                            <CardDescription>{movie.release_year} &middot; {movie.genres.join(", ")}</CardDescription>
                         </CardHeader>
                     </Card>
                 </DialogTrigger>
@@ -77,35 +74,36 @@ export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, on
                             <span className="font-medium text-foreground">Starring:</span> {movie.actor_names.join(", ")}
                         </p>
                     </div>
-
                     <DialogFooter>
-                        <div className="flex flex-col gap-2 w-full">
-                            <div className="w-full flex justify-between items-center">
-                                <p className="text-xs w-fit">Added by: {movie.added_by}</p>
-                                <div className="flex items-center gap-2 w-fit">
-                                    <Badge variant="ghost">{movie.vote_count} votes</Badge>
-                                    <VoteForm movieId={movie.id} userVoted={movie.user_voted} handleClose={handleClose} onVoted={onVoted} />
-                                </div>
-                            </div>
-                            {movie.voted_users.length > 0 && (
-                                <ul className="flex flex-row gap-2 flex-wrap">
-                                    {movie.voted_users.map(user => (
-                                        <li key={user.id} className="w-10 h-10">
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Link href={`/profile/${encodeURIComponent(user.username)}`}>
-                                                        <ProfileImageWithFallback src={user.image_url ?? ""} alt={user.username} username={user.username} size="small" />
-                                                    </Link>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{user.username}</p>
-                                                </TooltipContent>
+                        <div className="flex flex-col w-full">
+                            <VoteForm
+                                movieNightId={movieNightId}
+                                movieId={movie.id}
+                                userVoted={userVoted}
+                                handleClose={() => setIsOpen(false)}
+                            />
+                            {movie.votes.length > 0 && (
+                                <>
+                                    <p className="mb-2 font-medium text-foreground">Votes:</p>
+                                    <ul className="flex flex-row gap-2 flex-wrap self-start w-full">
+                                        {movie.votes.map(user => (
+                                            <li key={user.user_id} className="w-10 h-10">
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Link href={`/profile/${encodeURIComponent(user.username)}`}>
+                                                            <ProfileImageWithFallback src={user.image_url ?? ""} alt={user.username} username={user.username} size="small" />
+                                                        </Link>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <p>{user.username}</p>
+                                                    </TooltipContent>
 
 
-                                            </Tooltip>
-                                        </li>
-                                    ))}
-                                </ul>
+                                                </Tooltip>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </>
                             )}
                         </div>
                     </DialogFooter>
@@ -114,3 +112,4 @@ export default function MovieItem({ movie, onVoted }: { movie: MovieItemType, on
         </li >
     )
 }
+

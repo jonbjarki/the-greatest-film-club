@@ -1,10 +1,8 @@
-
-import asyncio
-
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
-from database import engine, create_db_and_tables, run_migrations
-from routers import movies, users, auth
+
+from database import engine, run_migrations
+from routers import *
 
 
 @asynccontextmanager
@@ -17,9 +15,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-app.include_router(movies.router)
+# app.include_router(movies.router)
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(club.router)
+app.include_router(movienights.router)
 
 
 @app.get("/health")

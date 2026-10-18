@@ -4,7 +4,7 @@ auth:
     type: bearer
     name: Bearer Token
     credentials:
-      token: "{{tmdb_key}}"
+      token: "{{vault:tmdb_key}}"
     rules:
       url: api.themoviedb.org
 order: 3040905090039807

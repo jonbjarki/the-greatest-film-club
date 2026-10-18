@@ -1,5 +1,5 @@
 "use server"
-import { credentialsSchema } from "@/lib/schemas";
+import { credentialsSchema } from "@/schemas/auth-schemas";
 import { signIn } from "@/../auth";
 import z from "zod";
 import { AuthError } from "next-auth";
@@ -10,6 +10,7 @@ export type SignUpState = {
     message: string,
     errors?: {
         fieldErrors: {
+            email?: string[],
             username?: string[],
             password?: string[]
         }
@@ -22,6 +23,7 @@ export type SignInState = {
 
 export async function signUpAction(_state: SignUpState, formData: FormData): Promise<SignUpState> {
     const data = {
+        email: formData.get("email"),
         username: formData.get("username"),
         password: formData.get("password")
     }
@@ -45,6 +47,13 @@ export async function signUpAction(_state: SignUpState, formData: FormData): Pro
     });
     if (!res.ok) {
         if (res.status == 400) {
+            const { detail } = await res.json().catch(() => ({ detail: null }));
+            if (detail === "Email already registered") {
+                return { error: null, message: "", errors: { fieldErrors: { email: ["This email is already registered"] } } };
+            }
+            if (detail === "Username already registered") {
+                return { error: null, message: "", errors: { fieldErrors: { username: ["This username is already taken"] } } };
+            }
             return {
                 error: "User already exists",
                 message: ""

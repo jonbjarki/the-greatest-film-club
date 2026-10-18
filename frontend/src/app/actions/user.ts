@@ -1,7 +1,7 @@
 "use server"
 
 import { authenticatedFetch } from "@/lib/auth"
-import { UpdateUserProfile, UserProfile, userProfileSchema } from "@/lib/schemas";
+import { UpdateUserProfile, UserProfile, userProfileSchema } from "@/schemas/user-schemas";
 import { updateTag } from "next/cache";
 
 export async function getUserByName(username: string): Promise<UserProfile | null> {
