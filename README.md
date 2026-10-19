@@ -6,7 +6,7 @@ A web app for running a film club. Members create clubs, invite friends, plan mo
 
 - **Accounts:** register, log in and edit your profile, including uploading an avatar.
 - **Clubs:** create a club, invite users by username, accept invites and leave clubs.
-- **Roles:** each club has owners, admins and members. Owners and admins can change member roles and remove members.
+- **Roles:** each club has an owner, admins and members. Only the owner can change member roles and remove members.
 - **Movie nights:** schedule a movie night with a voting deadline.
 - **Nominations and voting:** search [TMDB](https://www.themoviedb.org/) for films, add them to a movie night and vote for the ones you want to watch.
 
