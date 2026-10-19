@@ -9,6 +9,7 @@ export async function searchForMovie(query: string) {
     if (!res.ok) {
         throw new Error(`Failed to search for movies: ${res.statusText}`);
     }
+    await new Promise(resolve => setTimeout(resolve, 500)); // simulated delay
     return movieSearchResponseSchema.parse(await res.json());
 }
 

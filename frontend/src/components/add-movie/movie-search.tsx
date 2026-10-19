@@ -7,6 +7,7 @@ import { MovieSearchItemType } from "@/schemas/movie-schemas";
 import MovieSearchItem from "./movie-search-item";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useDebouncedCallback } from 'use-debounce';
 
 const initialState = {
     message: "",
@@ -20,13 +21,14 @@ export default function MovieSearchInput({ movieNightId, closeDialog }: { movieN
     const [state, formAction, pending] = useActionState(addMovieToMovieNightAction, initialState);
     const router = useRouter();
 
+    const debouncedSearch = useDebouncedCallback(async (query: string) => {
+        const res = await searchForMovie(query);
+        setResults(res.results);
+    }, 300);
+
     useEffect(() => {
-        const searchFunction = async () => {
-            const res = await searchForMovie(deferred);
-            setResults(res.results);
-        }
-        searchFunction();
-    }, [deferred])
+        debouncedSearch(deferred);
+    }, [deferred, debouncedSearch]);
 
     useEffect(() => {
         if (state.message) {
