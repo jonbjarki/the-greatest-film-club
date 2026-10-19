@@ -18,9 +18,9 @@ interface ImageWithFallbackProps {
 export default function ProfileImageWithFallback({ src, alt, username, size }: ImageWithFallbackProps) {
     const initials = getInitials(username);
     return (
-        <span className={`relative w-full h-full flex items-center justify-center ${size === "small" ? "text-xl" : "text-6xl"}`}>
+        <span className={`relative w-full h-full flex items-center justify-center rounded-full overflow-hidden ${size === "small" ? "text-xl" : "text-6xl"}`}>
             {src !== "" ?
-                <Image src={src} alt={alt} className={`rounded-full object-contain overflow-hidden`} fill />
+                <Image src={src} alt={alt} className="object-cover" sizes={size === "small" ? "56px" : "176px"} fill />
                 :
                 <div className="w-full h-full flex items-center justify-center rounded-full bg-gray-300 text-gray-700">{initials}</div>
             }
