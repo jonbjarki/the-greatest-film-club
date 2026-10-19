@@ -1,0 +1,25 @@
+$kind: http-request
+description: |-
+  Invites a user to the club. Only active owners and admins can invite. The new membership has status `invited` and role `member` until the user joins.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `403` | The caller is not an active owner or admin of the club. |
+  | `404` | The club or the user does not exist. |
+  | `409` | The user is already a member or already invited. |
+url: '{{base_url}}/clubs/:club_id/invite/:username'
+method: POST
+pathVariables:
+- key: club_id
+  value: '{{club_id}}'
+  description: The club's numeric ID.
+- key: username
+  value: '{{username}}'
+  description: Username of the user to invite. Matching ignores case.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 7000
+examples: ./.resources/Invite User.resources/examples

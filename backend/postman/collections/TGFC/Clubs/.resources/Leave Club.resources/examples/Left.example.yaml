@@ -1,0 +1,20 @@
+$kind: http-example
+name: Left
+request:
+  url: '{{base_url}}/clubs/:club_id/leave'
+  method: DELETE
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      null
+order: 1000

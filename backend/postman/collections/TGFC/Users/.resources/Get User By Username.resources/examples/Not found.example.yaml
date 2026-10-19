@@ -1,0 +1,22 @@
+$kind: http-example
+name: Not found
+request:
+  url: '{{base_url}}/users/:username'
+  method: GET
+  pathVariables:
+  - key: username
+    value: '{{username}}'
+    description: The user's username. Matching ignores case.
+response:
+  statusCode: 404
+  statusText: Not Found
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "User not found"
+      }
+order: 2000

@@ -1,0 +1,21 @@
+$kind: http-request
+description: |-
+  Removes the caller from the club. The owner cannot leave. Returns `200` with a `null` body.
+
+  | Status | When |
+  | --- | --- |
+  | `400` | The caller is not an active member, or is the owner. |
+  | `401` | The token is missing, invalid or expired. |
+  | `404` | The club does not exist. |
+url: '{{base_url}}/clubs/:club_id/leave'
+method: DELETE
+pathVariables:
+- key: club_id
+  value: '{{club_id}}'
+  description: The club's numeric ID.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 9000
+examples: ./.resources/Leave Club.resources/examples

@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Returns a club by its ID, with the caller's membership in `member`. The caller must be a member, either active or invited.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `404` | The club does not exist, or the caller is not a member. |
+url: '{{base_url}}/clubs/id/:club_id'
+method: GET
+pathVariables:
+- key: club_id
+  value: '{{club_id}}'
+  description: The club's numeric ID.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 3000
+examples: ./.resources/Get Club By ID.resources/examples

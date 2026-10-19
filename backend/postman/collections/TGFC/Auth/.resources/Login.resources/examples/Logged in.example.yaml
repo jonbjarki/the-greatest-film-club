@@ -1,0 +1,24 @@
+$kind: http-example
+name: Logged in
+request:
+  url: '{{base_url}}/auth/login'
+  method: POST
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "user": {
+          "username": "filmfan",
+          "id": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
+        },
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "token_type": "bearer",
+        "expires_in": 604800
+      }
+order: 1000

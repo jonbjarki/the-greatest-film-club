@@ -1,13 +1,31 @@
 $kind: http-request
-url: "{{base_url}}/clubs/"
+description: |-
+  Creates a club and makes the caller its active owner.
+
+  | Field | Rules |
+  | --- | --- |
+  | `name` | Required. 4-50 characters: letters, numbers and spaces. Must be unique after normalization (`Film Club` and `film club` clash). |
+  | `description` | Optional. Up to 255 characters. |
+
+  The response includes `normalized_name` (lowercase, spaces replaced by hyphens), which is used in club URLs, and the caller's membership in `member`.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `409` | A club with the same normalized name exists. |
+  | `422` | A field fails validation. |
+url: '{{base_url}}/clubs/'
 method: POST
 body:
   type: json
-  content: "{\r
-
-    \    \"name\": \"Club 2\",\r
-
-    \    \"description\": \"Test club\"\r
-
-    }"
-order: 3712769237602251
+  content: |-
+    {
+      "name": "The Greatest Film Club",
+      "description": "Weekly movie nights with friends"
+    }
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 1000
+examples: ./.resources/Create Club.resources/examples

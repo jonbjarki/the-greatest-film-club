@@ -1,0 +1,30 @@
+$kind: http-example
+name: Invited
+request:
+  url: '{{base_url}}/clubs/:club_id/invite/:username'
+  method: POST
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+  - key: username
+    value: '{{username}}'
+    description: Username of the user to invite. Matching ignores case.
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "club_id": 1,
+        "user_id": "0199a1b2-9f8e-7d6c-8b5a-4f3e2d1c0b9a",
+        "role": "member",
+        "status": "invited",
+        "invited_at": "2026-10-19T18:30:00.000000Z",
+        "joined_at": null
+      }
+order: 1000

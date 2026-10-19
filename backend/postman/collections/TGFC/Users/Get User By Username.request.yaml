@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Returns another user's public profile. The `email` field is not included.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `404` | No user has that username. |
+url: '{{base_url}}/users/:username'
+method: GET
+pathVariables:
+- key: username
+  value: '{{username}}'
+  description: The user's username. Matching ignores case.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 3000
+examples: ./.resources/Get User By Username.resources/examples

@@ -1,4 +1,21 @@
 $kind: http-request
-url: "{{base_url}}/clubs/name/the-greatest-film-club"
+description: |-
+  Returns a club by its normalized name, the form used in frontend URLs. The caller must be a member, either active or invited.
+
+  | Status | When |
+  | --- | --- |
+  | `400` | The name contains characters other than letters, numbers and hyphens. |
+  | `401` | The token is missing, invalid or expired. |
+  | `404` | The club does not exist, or the caller is not a member. |
+url: '{{base_url}}/clubs/name/:club_name'
 method: GET
-order: 1791470029084
+pathVariables:
+- key: club_name
+  value: '{{club_name}}'
+  description: The club's `normalized_name`, for example `the-greatest-film-club`. Letters, numbers and hyphens only. Matching ignores case.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 4000
+examples: ./.resources/Get Club By Name.resources/examples

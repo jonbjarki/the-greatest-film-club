@@ -1,0 +1,22 @@
+$kind: http-example
+name: Owner cannot leave
+request:
+  url: '{{base_url}}/clubs/:club_id/leave'
+  method: DELETE
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "You can not leave a club while you're the owner"
+      }
+order: 2000

@@ -1,0 +1,21 @@
+$kind: http-request
+description: |-
+  Lists every movie night in a club. The caller must be an active member.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `403` | The caller is not an active member of the club. |
+  | `404` | The club does not exist. |
+url: '{{base_url}}/movie-nights/club/:club_id'
+method: GET
+pathVariables:
+- key: club_id
+  value: '{{club_id}}'
+  description: The club's numeric ID.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 2000
+examples: ./.resources/Get Club Movie Nights.resources/examples

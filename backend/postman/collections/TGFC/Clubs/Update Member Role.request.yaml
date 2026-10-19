@@ -1,0 +1,32 @@
+$kind: http-request
+description: |-
+  Changes an active member's role to `member` or `admin`. Only the club owner can do this. The owner's role can't be changed, and ownership can't be transferred.
+
+  | Status | When |
+  | --- | --- |
+  | `400` | The target is the owner, the new role is `owner`, or the target has not joined yet. |
+  | `401` | The token is missing, invalid or expired. |
+  | `403` | The caller is not the club's active owner. |
+  | `404` | The club or the member does not exist. |
+  | `422` | `role` is not `member`, `admin` or `owner`. |
+url: '{{base_url}}/clubs/:club_id/members/:user_id/role'
+method: PATCH
+pathVariables:
+- key: club_id
+  value: '{{club_id}}'
+  description: The club's numeric ID.
+- key: user_id
+  value: '{{user_id}}'
+  description: The member's user ID (UUID).
+body:
+  type: json
+  content: |-
+    {
+      "role": "admin"
+    }
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 10000
+examples: ./.resources/Update Member Role.resources/examples

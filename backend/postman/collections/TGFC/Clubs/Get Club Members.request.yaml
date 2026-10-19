@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Lists every member of the club, including invited users, with each user's public profile. The caller must be a member.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `404` | The club does not exist, or the caller is not a member. |
+url: '{{base_url}}/clubs/club/:club_id/members'
+method: GET
+pathVariables:
+- key: club_id
+  value: '{{club_id}}'
+  description: The club's numeric ID.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 5000
+examples: ./.resources/Get Club Members.resources/examples

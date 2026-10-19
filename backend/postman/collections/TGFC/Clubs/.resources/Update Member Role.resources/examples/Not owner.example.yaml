@@ -1,0 +1,25 @@
+$kind: http-example
+name: Not owner
+request:
+  url: '{{base_url}}/clubs/:club_id/members/:user_id/role'
+  method: PATCH
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+  - key: user_id
+    value: '{{user_id}}'
+    description: The member's user ID (UUID).
+response:
+  statusCode: 403
+  statusText: Forbidden
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "Only the club owner can manage members"
+      }
+order: 2000

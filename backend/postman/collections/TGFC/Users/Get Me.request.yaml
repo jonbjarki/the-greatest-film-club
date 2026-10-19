@@ -1,8 +1,15 @@
 $kind: http-request
-url: "{{base_url}}/users/me"
+description: |-
+  Returns the logged-in user's profile, including the private `email` field.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+url: '{{base_url}}/users/me'
 method: GET
 auth:
   type: inherit
   credentials:
     id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
-order: 3000000000000
+order: 1000
+examples: ./.resources/Get Me.resources/examples

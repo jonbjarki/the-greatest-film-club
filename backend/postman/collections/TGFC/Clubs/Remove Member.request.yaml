@@ -1,0 +1,25 @@
+$kind: http-request
+description: |-
+  Removes a member or cancels a pending invite. Only the club owner can do this, and the owner can't be removed. Returns `204 No Content`.
+
+  | Status | When |
+  | --- | --- |
+  | `400` | The target is the owner. |
+  | `401` | The token is missing, invalid or expired. |
+  | `403` | The caller is not the club's active owner. |
+  | `404` | The club or the member does not exist. |
+url: '{{base_url}}/clubs/:club_id/members/:user_id'
+method: DELETE
+pathVariables:
+- key: club_id
+  value: '{{club_id}}'
+  description: The club's numeric ID.
+- key: user_id
+  value: '{{user_id}}'
+  description: The member's user ID (UUID).
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 11000
+examples: ./.resources/Remove Member.resources/examples

@@ -1,0 +1,29 @@
+$kind: http-example
+name: Created
+request:
+  url: '{{base_url}}/clubs/'
+  method: POST
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "name": "The Greatest Film Club",
+        "description": "Weekly movie nights with friends",
+        "id": 1,
+        "normalized_name": "the-greatest-film-club",
+        "member": {
+          "club_id": 1,
+          "user_id": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b",
+          "role": "owner",
+          "status": "active",
+          "invited_at": null,
+          "joined_at": "2026-10-19T18:30:00.000000Z"
+        }
+      }
+order: 1000

@@ -1,2 +1,6 @@
 $kind: collection
-order: 812779497848831
+description: |-
+  Endpoints from `routers/club.py` (prefix `/clubs`). All of them require a Bearer token.
+
+  Members have a `role` (`member`, `admin` or `owner`) and a `status` (`invited` or `active`). Owners and admins can invite users. Only the owner can change roles or remove members.
+order: 3000

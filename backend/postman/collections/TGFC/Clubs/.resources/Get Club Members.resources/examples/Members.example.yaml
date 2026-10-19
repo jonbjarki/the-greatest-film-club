@@ -1,0 +1,49 @@
+$kind: http-example
+name: Members
+request:
+  url: '{{base_url}}/clubs/club/:club_id/members'
+  method: GET
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "club_id": 1,
+          "role": "owner",
+          "status": "active",
+          "invited_at": null,
+          "joined_at": "2026-10-19T18:30:00.000000Z",
+          "user": {
+            "username": "filmfan",
+            "image_url": "https://example.com/avatars/filmfan.png",
+            "bio": "I watch way too many Studio Ghibli films.",
+            "id": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b",
+            "created_at": "2026-10-19T18:30:00.000000Z"
+          }
+        },
+        {
+          "club_id": 1,
+          "role": "member",
+          "status": "invited",
+          "invited_at": "2026-10-19T18:30:00.000000Z",
+          "joined_at": null,
+          "user": {
+            "username": "cinephile",
+            "image_url": null,
+            "bio": null,
+            "id": "0199a1b2-9f8e-7d6c-8b5a-4f3e2d1c0b9a",
+            "created_at": "2026-10-19T18:30:00.000000Z"
+          }
+        }
+      ]
+order: 1000

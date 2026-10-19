@@ -1,0 +1,22 @@
+$kind: http-example
+name: Already added
+request:
+  url: '{{base_url}}/movie-nights/:movie_night_id/movies?movie_id={{movie_id}}'
+  method: POST
+  pathVariables:
+  - key: movie_night_id
+    value: '{{movie_night_id}}'
+    description: The movie night's numeric ID.
+response:
+  statusCode: 409
+  statusText: Conflict
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "Movie already added to this movie night"
+      }
+order: 2000

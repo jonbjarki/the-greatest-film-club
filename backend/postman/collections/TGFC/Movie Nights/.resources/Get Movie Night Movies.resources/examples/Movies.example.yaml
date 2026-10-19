@@ -1,0 +1,50 @@
+$kind: http-example
+name: Movies
+request:
+  url: '{{base_url}}/movie-nights/:movie_night_id/movies'
+  method: GET
+  pathVariables:
+  - key: movie_night_id
+    value: '{{movie_night_id}}'
+    description: The movie night's numeric ID.
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": 129,
+          "name": "Spirited Away",
+          "description": "A young girl, Chihiro, becomes trapped in a strange new world of spirits...",
+          "release_year": 2001,
+          "genres": [
+            "Animation",
+            "Family",
+            "Fantasy"
+          ],
+          "actor_names": [
+            "Rumi Hiiragi",
+            "Miyu Irino",
+            "Mari Natsuki"
+          ],
+          "director_names": [
+            "Hayao Miyazaki"
+          ],
+          "backdrop_url": "https://image.tmdb.org/t/p/w500/backdrop.jpg",
+          "poster_url": "https://image.tmdb.org/t/p/w500/poster.jpg",
+          "votes": [
+            {
+              "user_id": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b",
+              "image_url": "https://example.com/avatars/filmfan.png",
+              "username": "filmfan",
+              "created_at": "2026-10-19T18:30:00.000000Z"
+            }
+          ]
+        }
+      ]
+order: 1000

@@ -1,0 +1,15 @@
+$kind: http-request
+description: |-
+  Lists the clubs the caller is an active member of. Each club includes the caller's membership in `member`. Pending invites are not included. See **Get My Invites**.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+url: '{{base_url}}/clubs/user/'
+method: GET
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 2000
+examples: ./.resources/Get My Clubs.resources/examples

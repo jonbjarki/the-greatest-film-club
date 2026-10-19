@@ -1,0 +1,25 @@
+$kind: http-example
+name: Already invited
+request:
+  url: '{{base_url}}/clubs/:club_id/invite/:username'
+  method: POST
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+  - key: username
+    value: '{{username}}'
+    description: Username of the user to invite. Matching ignores case.
+response:
+  statusCode: 409
+  statusText: Conflict
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "User has already been invited to this club"
+      }
+order: 2000

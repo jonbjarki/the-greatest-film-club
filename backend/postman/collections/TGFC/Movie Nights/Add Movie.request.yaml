@@ -1,0 +1,28 @@
+$kind: http-request
+description: |-
+  Adds a movie to a movie night. Only active owners and admins of the club can do this. `movie_id` is a **query parameter**, not a body field.
+
+  If the movie isn't in the database yet, its details and credits are fetched from TMDB and saved first. Returns the movie.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `403` | The caller is not an active owner or admin of the club. |
+  | `404` | The movie night does not exist, or TMDB has no movie with that ID. |
+  | `409` | The movie is already in this movie night. |
+url: '{{base_url}}/movie-nights/:movie_night_id/movies?movie_id={{movie_id}}'
+method: POST
+queryParams:
+- key: movie_id
+  value: '{{movie_id}}'
+  description: TMDB ID of the movie, from **Search Movies**.
+pathVariables:
+- key: movie_night_id
+  value: '{{movie_night_id}}'
+  description: The movie night's numeric ID.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 4000
+examples: ./.resources/Add Movie.resources/examples

@@ -1,0 +1,20 @@
+$kind: http-request
+description: |-
+  Searches TMDB for movies by title and returns the top 10 results. Use a result's `id` as `movie_id` in **Add Movie**.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `4xx/5xx` | TMDB returned an error. The status is passed through with `Failed to search movies on TMDB`. |
+url: '{{base_url}}/movie-nights/search?query=spirited away'
+method: GET
+queryParams:
+- key: query
+  value: spirited away
+  description: Movie title to search for. A blank query returns an empty list.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 3000
+examples: ./.resources/Search Movies.resources/examples

@@ -1,0 +1,28 @@
+$kind: http-example
+name: Validation error
+request:
+  url: '{{base_url}}/movie-nights/'
+  method: POST
+response:
+  statusCode: 422
+  statusText: Unprocessable Content
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": [
+          {
+            "type": "missing",
+            "loc": [
+              "body",
+              "title"
+            ],
+            "msg": "Field required",
+            "input": null
+          }
+        ]
+      }
+order: 3000
