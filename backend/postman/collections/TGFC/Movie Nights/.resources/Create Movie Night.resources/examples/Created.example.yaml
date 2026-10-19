@@ -1,0 +1,23 @@
+$kind: http-example
+name: Created
+request:
+  url: '{{base_url}}/movie-nights/'
+  method: POST
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "title": "Ghibli Night",
+        "description": "Pick your favourite Studio Ghibli film",
+        "club_id": 1,
+        "deadline": "2026-10-24T20:00:00Z",
+        "id": 1,
+        "normalized_title": "ghibli-night"
+      }
+order: 1000

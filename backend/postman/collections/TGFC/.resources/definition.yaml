@@ -1,4 +1,16 @@
 $kind: collection
+description: |-
+  API for TGFC, the movie night club app. There is one folder per FastAPI router in `backend/routers/`.
+
+  ## Setup
+
+  1. Select the **TGFC.Dev** environment and set `base_url` (for example `http://localhost:8000`).
+  2. Add the `POSTMAN_USERNAME` and `POSTMAN_PASSWORD` vault secrets for your test account. **Auth > Register** can create it.
+  3. Run **Auth > Login**. Its script saves the token to the `ACCESS_TOKEN` vault secret, and every other request sends that token as a Bearer token. Tokens last 7 days.
+
+  The collection variables `club_id`, `club_name`, `movie_night_id`, `movie_id`, `username` and `user_id` fill the path variables. Change them to match your data.
+
+  Errors come back as `{"detail": "..."}`. Validation errors (`422`) return a list of problems in `detail`.
 variables:
   - key: json_web_token_043p
     secret: true
@@ -6,16 +18,33 @@ variables:
   - key: json_web_token_0ip2
     secret: true
     disabled: false
+  - key: club_id
+    value: "1"
+  - key: club_name
+    value: the-greatest-film-club
+  - key: movie_night_id
+    value: "1"
+  - key: movie_id
+    value: "129"
+  - key: username
+    value: filmfan
+  - key: user_id
+    value: 0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b
 auth:
-  - id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
-    type: bearer
-    name: Bearer Token
-    credentials:
-      token: "{{vault:ACCESS_TOKEN}}"
   - id: 51739ff1-d142-474a-a41d-a2b52edec471
     type: oauth2
     name: OAuth 2.0
     credentials:
+      - key: tokenType
+        value: bearer
+      - key: token_id
+        value: 02968af3-d705-4099-a666-92065c691d58
+      - key: accessToken
+        value: "{{vault:jwt_token}}"
+      - key: expires_in
+        value: 604800
+      - key: timestamp
+        value: 1791472625958
       - key: addTokenTo
         value: header
       - key: id
@@ -34,3 +63,8 @@ auth:
         value: "{{vault:POSTMAN_PASSWORD}}"
       - key: id
         value: collection/A8F1f22CDBa16f3e3EA73a2C/b1397e40-6f0b-4456-b047-d6ba94a4669b/filesystem
+  - id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+    type: bearer
+    name: Bearer Token
+    credentials:
+      token: "{{vault:ACCESS_TOKEN}}"

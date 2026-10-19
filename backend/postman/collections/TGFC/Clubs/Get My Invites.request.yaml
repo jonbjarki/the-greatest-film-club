@@ -1,0 +1,15 @@
+$kind: http-request
+description: |-
+  Lists the clubs the caller has been invited to but has not joined yet.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+url: '{{base_url}}/clubs/invites'
+method: GET
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 6000
+examples: ./.resources/Get My Invites.resources/examples

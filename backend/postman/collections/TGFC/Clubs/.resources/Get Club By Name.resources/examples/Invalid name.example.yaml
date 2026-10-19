@@ -1,0 +1,22 @@
+$kind: http-example
+name: Invalid name
+request:
+  url: '{{base_url}}/clubs/name/:club_name'
+  method: GET
+  pathVariables:
+  - key: club_name
+    value: '{{club_name}}'
+    description: The club's `normalized_name`, for example `the-greatest-film-club`. Letters, numbers and hyphens only. Matching ignores case.
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "Name must only contain letters, numbers, and hyphens"
+      }
+order: 2000

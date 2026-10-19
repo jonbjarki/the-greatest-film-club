@@ -1,0 +1,25 @@
+$kind: http-example
+name: Owner cannot be removed
+request:
+  url: '{{base_url}}/clubs/:club_id/members/:user_id'
+  method: DELETE
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+  - key: user_id
+    value: '{{user_id}}'
+    description: The member's user ID (UUID).
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "The owner can't be removed from the club"
+      }
+order: 2000

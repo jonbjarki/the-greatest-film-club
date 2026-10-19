@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TGFC Frontend
 
-## Getting Started
+The Next.js frontend for TGFC. For an overview of the whole project, see the [root README](../README.md).
 
-First, run the development server:
+## Requirements
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Node.js and [pnpm](https://pnpm.io/)
+- The [backend](../backend/README.md) running locally
+
+## Environment variables
+
+Create a `.env` file in this folder:
+
+```env
+API_URL=http://localhost:8000
+AUTH_SECRET=
+BLOB_READ_WRITE_TOKEN=
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Variable | Where to get it |
+| -------- | --------------- |
+| `API_URL` | The URL of the backend. Locally this is `http://localhost:8000`. |
+| `AUTH_SECRET` | Any long random string. Auth.js uses it to encrypt login sessions. Generate one with `npx auth secret` (this writes it to `.env.local`, which also works) or `openssl rand -base64 32`. |
+| `BLOB_READ_WRITE_TOKEN` | Only needed for uploading profile pictures. In the [Vercel dashboard](https://vercel.com/dashboard), open **Storage**, create a **Blob** store, then copy the token from its **.env.local** tab. |
+| `BACKEND_INTERNAL_URL` | Do not set this locally. Vercel sets it automatically in deployments, and it takes priority over `API_URL`. |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Running
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm install
+pnpm dev
+```
 
-## Learn More
+Open [http://localhost:3000](http://localhost:3000). The dev server reloads automatically when you change code.
 
-To learn more about Next.js, take a look at the following resources:
+## Other commands
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm build   # production build
+pnpm start   # serve the production build
+pnpm lint    # run ESLint
+```

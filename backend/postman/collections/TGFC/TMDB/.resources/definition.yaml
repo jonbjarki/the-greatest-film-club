@@ -1,10 +1,12 @@
 $kind: collection
+description: |-
+  Direct calls to the TMDB API, not the TGFC backend. Useful for checking what TMDB returns. Uses the `tmdb_key` vault secret as a Bearer token.
 auth:
-  - id: 0a61c697-e197-4a82-bf1f-8f5fe60bf14b
-    type: bearer
-    name: Bearer Token
-    credentials:
-      token: "{{vault:tmdb_key}}"
-    rules:
-      url: api.themoviedb.org
-order: 3040905090039807
+- id: 0a61c697-e197-4a82-bf1f-8f5fe60bf14b
+  type: bearer
+  name: Bearer Token
+  credentials:
+    token: '{{vault:tmdb_key}}'
+  rules:
+    url: api.themoviedb.org
+order: 5000

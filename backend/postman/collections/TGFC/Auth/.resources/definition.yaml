@@ -1,0 +1,6 @@
+$kind: collection
+description: |-
+  Endpoints from `routers/auth.py` (prefix `/auth`). These are public and need no token.
+
+  Run **Login** first: its post-response script stores the token in the `ACCESS_TOKEN` vault secret, which every other request sends as a Bearer token.
+order: 1000

@@ -1,0 +1,25 @@
+$kind: http-request
+description: |-
+  Votes for a movie in a movie night. Any active member can vote once per movie, and can vote for several movies.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `403` | The caller is not an active member, or the voting deadline has passed. |
+  | `404` | The movie night does not exist, or the movie isn't in it. |
+  | `409` | The caller has already voted for this movie. |
+url: '{{base_url}}/movie-nights/:movie_night_id/movies/:movie_id/vote'
+method: POST
+pathVariables:
+- key: movie_night_id
+  value: '{{movie_night_id}}'
+  description: The movie night's numeric ID.
+- key: movie_id
+  value: '{{movie_id}}'
+  description: TMDB ID of a movie in this movie night.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 6000
+examples: ./.resources/Vote For Movie.resources/examples

@@ -1,0 +1,19 @@
+$kind: http-example
+name: Removed
+request:
+  url: '{{base_url}}/clubs/:club_id/members/:user_id'
+  method: DELETE
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+  - key: user_id
+    value: '{{user_id}}'
+    description: The member's user ID (UUID).
+response:
+  statusCode: 204
+  statusText: No Content
+  body:
+    type: text
+    content: ''
+order: 1000

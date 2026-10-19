@@ -1,2 +1,4 @@
 $kind: collection
-order: 73541743542271
+description: |-
+  Endpoints from `routers/users.py` (prefix `/users`). All of them require a Bearer token.
+order: 2000

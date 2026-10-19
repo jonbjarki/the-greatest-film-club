@@ -1,9 +1,13 @@
 workspace:
   id: b1397e40-6f0b-4456-b047-d6ba94a4669b
-
-# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
-
 cloudResources:
-  collections: {}
+  collections:
+    ../postman/collections/TGFC: 6ad6221b52f7c0309bb423b8
   globals:
     ../postman/globals/workspace.globals.yaml: 67c1b431-1422-46d6-8788-6cde6bf38b65
+  environments:
+    ../postman/environments/Development-1.environment.yaml: 49274450-699313f7-9f37-4d64-aeab-05172f7d87e1
+    ../postman/environments/Development-2.environment.yaml: 49274450-508bf64d-d4b6-4f9c-89f5-2706b54cc409
+    ../postman/environments/Development-3.environment.yaml: 49274450-ce4b707b-53e4-4858-a369-86417d8a087c
+    ../postman/environments/Development.environment.yaml: 49274450-1fca8259-75db-4792-9747-b19ab0e00d35
+    ../postman/environments/TGFC.Dev.environment.yaml: 49274450-2cd730d3-9c5d-4242-821f-93fcfa30aa51

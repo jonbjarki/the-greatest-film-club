@@ -1,0 +1,18 @@
+$kind: http-example
+name: Username taken
+request:
+  url: '{{base_url}}/users/me'
+  method: PATCH
+response:
+  statusCode: 400
+  statusText: Bad Request
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "Username already taken"
+      }
+order: 2000

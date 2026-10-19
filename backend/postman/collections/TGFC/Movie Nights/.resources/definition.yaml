@@ -1,0 +1,6 @@
+$kind: collection
+description: |-
+  Endpoints from `routers/movienights.py` (prefix `/movie-nights`). All of them require a Bearer token.
+
+  A movie night belongs to a club. Owners and admins create it and add movies, and every active member can vote. Once the optional `deadline` passes, voting closes.
+order: 4000

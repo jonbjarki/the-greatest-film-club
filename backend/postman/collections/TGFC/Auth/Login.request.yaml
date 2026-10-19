@@ -1,0 +1,29 @@
+$kind: http-request
+description: |-
+  Logs in with a username (case-insensitive) and password using the OAuth2 password flow. The body is sent as **x-www-form-urlencoded**.
+
+  Returns a JWT access token that is valid for 7 days (`expires_in` is in seconds). The post-response script saves it to the `ACCESS_TOKEN` vault secret so the other requests are authenticated automatically.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The username or password is wrong. |
+url: "{{base_url}}/auth/login"
+method: POST
+body:
+  type: urlencoded
+  content:
+    username: "{{vault:POSTMAN_USERNAME}}"
+    password: "{{vault:POSTMAN_PASSWORD}}"
+    grant_type: password
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |
+      if (pm.response.code === 200) {
+          const { access_token } = pm.response.json();
+          await pm.vault.set("ACCESS_TOKEN", access_token);
+      }
+    language: text/javascript
+order: 2000
+examples: ./.resources/Login.resources/examples

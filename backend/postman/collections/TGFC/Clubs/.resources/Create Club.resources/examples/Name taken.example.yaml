@@ -1,0 +1,18 @@
+$kind: http-example
+name: Name taken
+request:
+  url: '{{base_url}}/clubs/'
+  method: POST
+response:
+  statusCode: 409
+  statusText: Conflict
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "A club with this name already exists"
+      }
+order: 2000

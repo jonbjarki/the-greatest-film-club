@@ -1,0 +1,18 @@
+$kind: http-example
+name: Duplicate title
+request:
+  url: '{{base_url}}/movie-nights/'
+  method: POST
+response:
+  statusCode: 409
+  statusText: Conflict
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "This club already has a movie night with this title"
+      }
+order: 2000

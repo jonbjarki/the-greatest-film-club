@@ -1,0 +1,21 @@
+$kind: http-request
+description: |-
+  Lists the movies in a movie night, each with its votes. The caller must be an active member of the club.
+
+  | Status | When |
+  | --- | --- |
+  | `401` | The token is missing, invalid or expired. |
+  | `403` | The caller is not an active member of the club. |
+  | `404` | The movie night does not exist. |
+url: '{{base_url}}/movie-nights/:movie_night_id/movies'
+method: GET
+pathVariables:
+- key: movie_night_id
+  value: '{{movie_night_id}}'
+  description: The movie night's numeric ID.
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 5000
+examples: ./.resources/Get Movie Night Movies.resources/examples

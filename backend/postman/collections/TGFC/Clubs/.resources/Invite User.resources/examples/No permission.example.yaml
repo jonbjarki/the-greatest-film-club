@@ -1,0 +1,25 @@
+$kind: http-example
+name: No permission
+request:
+  url: '{{base_url}}/clubs/:club_id/invite/:username'
+  method: POST
+  pathVariables:
+  - key: club_id
+    value: '{{club_id}}'
+    description: The club's numeric ID.
+  - key: username
+    value: '{{username}}'
+    description: Username of the user to invite. Matching ignores case.
+response:
+  statusCode: 403
+  statusText: Forbidden
+  headers:
+  - key: content-type
+    value: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "detail": "You do not have permission to invite users to this club"
+      }
+order: 3000

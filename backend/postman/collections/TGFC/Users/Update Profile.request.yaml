@@ -1,7 +1,32 @@
 $kind: http-request
-url: "{{base_url}}/users/me"
+description: |-
+  Updates the logged-in user's profile. Send only the fields you want to change. All are optional:
+
+  | Field | Rules |
+  | --- | --- |
+  | `username` | 4-20 characters, same format rules as registration. Unique, ignoring case. |
+  | `email` | A valid email address, unique, ignoring case. |
+  | `bio` | 20-300 characters. |
+  | `image_url` | URL of the avatar image. |
+
+  Returns the updated profile.
+
+  | Status | When |
+  | --- | --- |
+  | `400` | The new username or email is already taken by another user. |
+  | `401` | The token is missing, invalid or expired. |
+  | `422` | A field fails validation. |
+url: '{{base_url}}/users/me'
 method: PATCH
 body:
   type: json
-  content: "{\r\n     \r\n}"
-order: 1799207764580848
+  content: |-
+    {
+      "bio": "I watch way too many Studio Ghibli films."
+    }
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 2000
+examples: ./.resources/Update Profile.resources/examples

@@ -1,0 +1,44 @@
+$kind: http-request
+description: |-
+  Creates a new user account. The body is sent as **form data**, not JSON.
+
+  | Field | Rules |
+  | --- | --- |
+  | `username` | Required. 4-20 characters: letters, numbers and single `.`, `_` or `-` separators. Must start and end with a letter or number. Reserved names such as `admin`, `me` or `login` are rejected. Unique, ignoring case. |
+  | `email` | Required. A valid email address, unique, ignoring case. |
+  | `password` | Required. 6-128 characters with at least one uppercase letter, one lowercase letter and one number. |
+  | `bio` | Optional. 20-300 characters. |
+  | `image_url` | Optional. URL of the avatar image. |
+
+  Returns the new user, including the private `email` field.
+
+  | Status | When |
+  | --- | --- |
+  | `400` | The username or email is already registered. |
+  | `422` | A field fails validation. |
+url: '{{base_url}}/auth/register'
+method: POST
+body:
+  type: formdata
+  content:
+  - type: text
+    key: username
+    value: '{{vault:POSTMAN_USERNAME}}'
+  - type: text
+    key: email
+    value: filmfan@example.com
+  - type: text
+    key: password
+    value: '{{vault:POSTMAN_PASSWORD}}'
+  - type: text
+    key: bio
+    value: I watch way too many Studio Ghibli films.
+    disabled: true
+  - type: text
+    key: image_url
+    value: https://example.com/avatars/filmfan.png
+    disabled: true
+auth:
+  type: noauth
+order: 1000
+examples: ./.resources/Register.resources/examples
