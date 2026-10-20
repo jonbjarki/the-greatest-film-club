@@ -28,8 +28,8 @@ proxy.ts             Re-exports auth as the Next proxy (route protection)
 next-auth.d.ts       Session/User/JWT type augmentation (id, username, accessToken, expires_at)
 src/
   app/
+    page.tsx             Public landing page; redirects signed-in users to /clubs
     (authenticated)/     Route group; layout calls auth() and redirects to /login, renders <Header>
-      page.tsx           Home
       clubs/             /clubs (list + invites), /clubs/create, /clubs/view/[name]/...
         view/[name]/movie-nights/[title]/   movie night page (movies list + add movie)
       profile/[username]/
