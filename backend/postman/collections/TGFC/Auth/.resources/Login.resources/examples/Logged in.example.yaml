@@ -17,8 +17,8 @@ response:
           "username": "filmfan",
           "id": "0199a1b2-3c4d-7e5f-8a9b-0c1d2e3f4a5b"
         },
-        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "access_token": "Zk3pQ8vN2xR7tL1mW9yB4cD6hJ0sA5uE8gK3nV7qT2o",
         "token_type": "bearer",
-        "expires_in": 604800
+        "expires_at": "2026-11-20T14:14:53.490956+00:00"
       }
 order: 1000

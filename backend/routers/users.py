@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import func, select
 
 from auth import (
-    get_current_active_user,
+    get_current_user,
 )
 from database import get_session
 from models.user import User, UserPrivateRead, UserRead, UserUpdate
@@ -17,7 +17,7 @@ router = APIRouter(tags=["users"], prefix="/users")
 @router.patch("/me", response_model=UserPrivateRead)
 async def update_profile(
     session: Annotated[AsyncSession, Depends(get_session)],
-    current_user: Annotated[User, Depends(get_current_active_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
     data: UserUpdate,
 ) -> UserPrivateRead:
     # Extract the provided fields from the update data
@@ -61,7 +61,7 @@ async def update_profile(
 
 @router.get("/me", response_model=UserPrivateRead)
 async def get_profile(
-    current_user: Annotated[User, Depends(get_current_active_user)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ) -> UserPrivateRead:
     return current_user
 
@@ -69,7 +69,7 @@ async def get_profile(
 @router.get("/{username}", response_model=UserRead)
 async def get_user_by_username(
     username: str,
-    _current_user: Annotated[User, Depends(get_current_active_user)],
+    _current_user: Annotated[User, Depends(get_current_user)],
     session: Annotated[AsyncSession, Depends(get_session)],
 ):
     user = await session.execute(

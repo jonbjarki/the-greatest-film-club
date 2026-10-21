@@ -2,7 +2,7 @@ $kind: http-request
 description: |-
   Logs in with a username (case-insensitive) and password using the OAuth2 password flow. The body is sent as **x-www-form-urlencoded**.
 
-  Returns a JWT access token that is valid for 7 days (`expires_in` is in seconds). The post-response script saves it to the `ACCESS_TOKEN` vault secret so the other requests are authenticated automatically.
+  Starts a session and returns its token, which is valid for 30 days (`expires_at` is an ISO 8601 timestamp). Call **Logout** to end it early. The post-response script saves the token to the `ACCESS_TOKEN` vault secret so the other requests are authenticated automatically.
 
   | Status | When |
   | --- | --- |

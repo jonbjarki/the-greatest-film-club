@@ -80,7 +80,6 @@ Create `backend/.env`:
 DATABASE_URL=postgresql://postgres:Abc.123@localhost:5433/movies
 TMDB_BASE_URL=https://api.themoviedb.org/3
 API_KEY=<your TMDB API read access token>
-SECRET_KEY=<a long random string used to sign JWTs>
 ```
 
 Then install dependencies and start the dev server:

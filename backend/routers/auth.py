@@ -7,12 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import func, select
 
 from auth import (
-    ACCESS_TOKEN_EXPIRE_DAYS,
     authenticate_user,
-    create_access_token,
+    create_user_session,
+    get_current_session,
     hash_password,
 )
 from database import get_session
+from models.tokens import UserSession
 from models.user import User, UserPrivateRead, UserRegister
 
 router = APIRouter(tags=["auth"], prefix="/auth")
@@ -31,9 +32,7 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token = create_access_token(
-        data={"sub": str(user.id), "name": user.username}
-    )
+    access_token, expires_at = await create_user_session(session, user)
 
     return {
         "user": {
@@ -42,11 +41,17 @@ async def login(
         },
         "access_token": access_token,
         "token_type": "bearer",
-        "expires_in": ACCESS_TOKEN_EXPIRE_DAYS
-        * 24
-        * 60
-        * 60,  # convert days to seconds
+        "expires_at": expires_at,
     }
+
+
+@router.post("/logout", status_code=204)
+async def logout(
+    current_session: Annotated[UserSession, Depends(get_current_session)],
+    session: Annotated[AsyncSession, Depends(get_session)],
+):
+    await session.delete(current_session)
+    await session.commit()
 
 
 @router.post("/register", response_model=UserPrivateRead)
@@ -89,81 +94,3 @@ async def register_user(
         )
     await session.refresh(user)
     return user
-
-
-# @router.post("/refresh")
-# async def refresh_token(
-#     session: Annotated[AsyncSession, Depends(get_session)],
-#     refresh_token: str,
-# ):
-#     # Decode the refresh token to extract its payload
-#     payload = decode_refresh_token(refresh_token)
-#     jti = payload["jti"]
-#     user_id = str(payload["sub"])
-
-#     if not jti or not user_id:
-#         raise HTTPException(status_code=401, detail="Invalid refresh token")
-
-#     refresh_session = await get_refresh_session(session, jti, user_id)
-#     print(f"Decoded refresh token payload: {payload}")
-#     print(f"Refresh session: {refresh_session}")
-#     print("JTI:", jti)
-#     print("User ID:", user_id)
-
-#     # Check if the refresh session exists and is valid
-#     if not refresh_session:
-#         raise HTTPException(status_code=401, detail="Refresh token is invalid")
-#     if refresh_session.expires_at < datetime.now(timezone.utc):
-#         raise HTTPException(status_code=401, detail="Refresh token has expired")
-#     if (
-#         refresh_session.revoked_at
-#         and datetime.now(timezone.utc) >= refresh_session.revoked_at
-#     ):
-#         raise HTTPException(status_code=401, detail="Refresh token has been revoked")
-#     if (refresh_session.revoked_at
-#         and datetime.now(timezone.utc) < refresh_session.revoked_at):
-#         print("Refresh session has been revoked but is still within the grace period")
-#         print("Revoked at:", refresh_session.revoked_at)
-#         print("Current time:", datetime.now(timezone.utc))
-#         # If the refresh session has been revoked but is still within the grace period, return the next set of tokens if available
-#         if (
-#             refresh_session.next_access_token
-#             and refresh_session.next_refresh_token
-#             and refresh_session.next_access_expires_at
-#         ):
-#             return {
-#                 "access_token": refresh_session.next_access_token,
-#                 "refresh_token": refresh_session.next_refresh_token,
-#                 "expires_in": (
-#                     refresh_session.next_access_expires_at - datetime.now(timezone.utc)
-#                 ).total_seconds(),
-#             }
-#         else:
-#             raise HTTPException(
-#                 status_code=401, detail="Refresh token has been revoked"
-#             )
-
-#     # Generate new access and refresh tokens
-#     new_jti = uuid7()
-#     access_token = create_access_token(
-#         data={"sub": user_id}
-#         )
-#     refresh_token, expires_at = create_refresh_token(
-#             data={"sub": user_id, "jti": str(new_jti)}
-#         )
-
-#     # Revoke the current refresh session and start grace period
-#     await revoke_refresh_session(
-#         session, refresh_session, access_token, refresh_token, expires_at
-#     )
-
-#     # Save new session
-#     await save_refresh_session(
-#         session, payload["sub"], str(new_jti), expires_at=expires_at
-#     )
-
-#     return {
-#         "access_token": access_token,
-#         "refresh_token": refresh_token,
-#         "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,  # convert minutes to seconds
-#     }

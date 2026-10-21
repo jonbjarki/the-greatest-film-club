@@ -1,66 +1,54 @@
 import { redirect, RedirectType } from "next/navigation";
-import { API_URL, redirectToLogin } from "@/lib/common";
-import { decode, getToken } from "next-auth/jwt";
-import { cookies } from "next/headers";
+import { API_URL } from "@/lib/common";
+import { getToken } from "next-auth/jwt";
+import { headers } from "next/headers";
 
-
-export class NotAuthenticatedError extends Error {
-    constructor() {
-        super();
-        this.name = 'NotAuthenticatedError';
-        Object.setPrototypeOf(this, NotAuthenticatedError.prototype);
-
-        if (Error.captureStackTrace) {
-            Error.captureStackTrace(this, NotAuthenticatedError);
-        }
+/**
+Whether Auth.js uses the `__Secure-` session cookie for this request.
+Mirrors Auth.js: it goes by the protocol of AUTH_URL, or of the incoming request when that isn't set.
+*/
+function usesSecureCookie(requestHeaders: Headers) {
+    const envUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL;
+    if (envUrl) {
+        return new URL(envUrl).protocol === "https:";
     }
+    return (requestHeaders.get("x-forwarded-proto") ?? "https") === "https";
 }
 
-async function getDecodedToken() {
-    // Retrieve the encoded authjs session token from cookies
-    const cookieStore = await cookies();
-
-    const cookieName = process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token";
-    const sessionCookie = cookieStore.get(cookieName)?.value;
-
-    if (!sessionCookie) return null;
-
-    // Decode the session cookie to extract the JWT token
-    const decodedToken = await decode({
-        token: sessionCookie,
+/** Reads the backend session token out of the encrypted Auth.js session cookie. */
+async function getAccessToken() {
+    const requestHeaders = await headers();
+    const token = await getToken({
+        req: { headers: requestHeaders },
         secret: process.env.AUTH_SECRET!,
-        salt: cookieName, // Use the cookie name as salt for decoding
+        secureCookie: usesSecureCookie(requestHeaders),
     });
-
-    if (!decodedToken) {
-        return null;
-    }
-
-    return decodedToken.accessToken;
+    return token?.accessToken ?? null;
 }
 
 
 /**
 Utility function for making authenticated requests to the backend API.
-It retrieves the JWT from the encoded session cookie and includes it in the Authorization header of the request. 
+It retrieves the backend session token from the encrypted session cookie and includes it in the Authorization header of the request.
+On a 401 it ends the Auth.js session and sends the user to the login page.
 */
 export async function authenticatedFetch(input: string, init?: RequestInit) {
-    const accessToken = await getDecodedToken();
-    const headers = new Headers(init?.headers || {});
+    const accessToken = await getAccessToken();
+    const requestHeaders = new Headers(init?.headers || {});
     if (accessToken) {
-        // If we have a valid access token, include it in the Authorization header
-        headers.set("Authorization", `Bearer ${accessToken}`);
+        requestHeaders.set("Authorization", `Bearer ${accessToken}`);
     }
 
-    // Make the authenticated request to the backend API, including the JWT in the Authorization header if available
     const res = await fetch(API_URL + input, {
         ...init,
-        headers
+        headers: requestHeaders
     });
 
     if (res.status === 401) {
-        // If the response status is 401 (Unauthorized), redirect to the sign-in page
-        redirectToLogin();
+        // The backend session is gone (expired or revoked). Server Components can't clear cookies,
+        // so a route handler signs out of Auth.js and then redirects to /login.
+        // redirect() works by throwing, so callers must not swallow it in a try/catch.
+        redirect("/api/auth/expired", RedirectType.replace);
     }
 
     return res;
