@@ -24,9 +24,10 @@ This is the Next.js frontend; it is a thin UI over a separate FastAPI backend in
 
 ```
 auth.ts              NextAuth config (root, NOT under src) — exports handlers, signIn, signOut, auth
-proxy.ts             Re-exports auth as the Next proxy (route protection)
-next-auth.d.ts       Session/User/JWT type augmentation (id, username, accessToken, expires_at)
+next-auth.d.ts       Session/User/JWT type augmentation (id, accessToken, expires_at)
 src/
+  proxy.ts           Re-exports auth as the Next proxy; the `authorized` callback in auth.ts protects routes
+                     (must live in src/, a root proxy.ts is ignored)
   app/
     page.tsx             Public landing page; redirects signed-in users to /clubs
     (authenticated)/     Route group; layout calls auth() and redirects to /login, renders <Header>
@@ -52,7 +53,8 @@ The top-level `components/` folder (outside `src`) is empty — put components i
 
 ## Data flow / conventions
 
-- **Backend access**: always go through `authenticatedFetch(path, init)` in `src/lib/auth.ts`. It decodes the Auth.js session cookie, attaches `Authorization: Bearer <backend access token>`, prefixes `API_URL`, and redirects to `/login` on 401. Only the login/register calls use plain `fetch`.
+- **Backend access**: always go through `authenticatedFetch(path, init)` in `src/lib/auth.ts`. It reads the backend session token from the Auth.js cookie with `getToken`, attaches `Authorization: Bearer <token>`, prefixes `API_URL`, and on 401 redirects to `/api/auth/expired` (which clears the Auth.js session). That redirect throws, so don't wrap calls in try/catch that swallows it. Only the login/register calls use plain `fetch`.
+- **Sessions**: the backend issues an opaque 30-day session token (stored hashed in `user_session`). Auth.js keeps it in its encrypted cookie (`strategy: "jwt"`), ends the Auth.js session when `expires_at` passes, and calls `/auth/logout` on sign-out.
 - `API_URL` = `BACKEND_INTERNAL_URL` (Vercel service binding in prod) ?? `API_URL` (`.env` locally).
 - **Server actions** (`src/app/actions/*.ts`) are used both for reads (called directly from async Server Components) and mutations (forms). Pattern:
   1. `authenticatedFetch(...)`
@@ -69,7 +71,7 @@ The top-level `components/` folder (outside `src`) is empty — put components i
 
 ## Backend API (for reference, `../backend/routers`)
 
-`/auth` (login form-encoded, register), `/users` (`/me`, `/{username}`, PATCH `/me`),
+`/auth` (login form-encoded, register, logout), `/users` (`/me`, `/{username}`, PATCH `/me`),
 `/clubs` (create, `/name/{name}`, `/user/`, `/invites`, `/{id}/join`, `/{club_id}/invite/{username}`, `/{club_id}/leave`, `/club/{club_id}/members`),
 `/movie-nights` (create, `/search?query=`, `/club/{club_id}`, `/{id}/movies` GET/POST `?movie_id=`).
 Check the router file before adding a new call — paths aren't always what you'd guess.

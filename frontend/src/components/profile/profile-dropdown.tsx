@@ -24,7 +24,7 @@ export default function ProfileDropdown({ user }: { user: UserProfile }) {
                     <Link href={`/profile/${user.username}`} className="w-full cursor-pointer">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem variant="destructive" asChild>
-                    <button onClick={() => signOut()} className="w-full cursor-pointer">Sign out</button>
+                    <button onClick={() => signOut({ redirectTo: "/", redirect: true })} className="w-full cursor-pointer">Sign out</button>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu >

@@ -1,0 +1,16 @@
+$kind: http-request
+description: |-
+  Ends the current session. The token sent in the `Authorization` header stops working immediately.
+
+  | Status | When |
+  | --- | --- |
+  | `204` | The session was revoked. |
+  | `401` | The token is missing, invalid, expired or already revoked. |
+url: "{{base_url}}/auth/logout"
+method: POST
+auth:
+  type: inherit
+  credentials:
+    id: 93274e17-223a-49b0-b273-ae92bb3e6ab2
+order: 3000
+examples: ./.resources/Logout.resources/examples

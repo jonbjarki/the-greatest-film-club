@@ -32,7 +32,8 @@ export const loginResponseSchema = z.object({
     }),
     access_token: z.string(),
     token_type: z.string(),
-    expires_in: z.number()
+    // ISO 8601 timestamp of when the backend session ends
+    expires_at: z.iso.datetime({ offset: true })
 });
 
 export type Credentials = z.infer<typeof credentialsSchema>;
