@@ -38,7 +38,6 @@ src/
     actions/             ALL backend calls live here as "use server" functions, one file per domain
                          (auth, club, movie-night, movie, user)
     api/auth/[...nextauth]/  NextAuth route handlers
-    api/auth/expired/        Signs out of Auth.js after a backend 401, then redirects to /login
     api/avatar/upload/       Vercel Blob client-upload token endpoint
   components/
     ui/                  shadcn generated primitives — add via the shadcn CLI, avoid hand-editing

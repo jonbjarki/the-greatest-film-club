@@ -16,7 +16,7 @@ function usesSecureCookie(requestHeaders: Headers) {
 }
 
 /** Reads the backend session token out of the encrypted Auth.js session cookie. */
-async function getAccessToken() {
+export async function getAccessToken() {
     const requestHeaders = await headers();
     const token = await getToken({
         req: { headers: requestHeaders },
